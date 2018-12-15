@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">nureSchedule</string>
+    <string name="weekBottomNavigation">Неделя</string>
+    <string name="semesterBottomNavigation">Семестр</string>
+    <string name="calendarBottomNavigation">Календарь</string>
+    <string name="settingsBottomNavigation">Настройки</string>
+</resources>
