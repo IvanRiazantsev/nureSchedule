@@ -10,10 +10,6 @@
         android:icon="@drawable/ic_schedule_black_24dp"
         android:title="@string/semesterBottomNavigation" />
     <item
-        android:id="@+id/calendarBottomNavigationItem"
-        android:icon="@drawable/ic_calendar_interface_symbol_tool"
-        android:title="@string/calendarBottomNavigation" />
-    <item
         android:id="@+id/settingsBottomNavigationItem"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/settingsBottomNavigation" />
