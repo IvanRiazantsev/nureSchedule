@@ -5,7 +5,12 @@
     <item
         android:id="@+id/calendarToolbarItem"
         android:icon="@drawable/ic_calendar"
-        android:title="@string/calendarBottomNavigation"
+        android:title="@string/calendarToolbarItem"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/groupsToolbarItem"
+        android:icon="@drawable/ic_group_black_24dp"
+        android:title="@string/groupsToolbarItem"
+        app:showAsAction="ifRoom" />
 
 </menu>

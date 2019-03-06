@@ -12,8 +12,8 @@ public class App extends Application {
 
     private static CistAPI cistAPI;
     private Retrofit retrofit;
-    private final String API_BASE_URL = "https://jsonplaceholder.typicode.com/";
-
+    private final String API_BASE_URL = "http://cist.nure.ua/ias/app/tt/";
+    private static final String key = "IRtablet";
 
     @Override
     public void onCreate() {
@@ -28,6 +28,10 @@ public class App extends Application {
 
     public static CistAPI getCistAPI() {
         return cistAPI;
+    }
+
+    public static String getKey() {
+        return key;
     }
 
     public static Date getDateFromUnix(Long timestamp) {
