@@ -11,11 +11,12 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark">
+        android:background="@color/colorToolbarLight"
+        app:layout_constraintTop_toTopOf="parent">
 
         <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/groupsSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -25,8 +26,28 @@
             app:ms_enableErrorLabel="false"
             app:ms_enableFloatingLabel="false" />
 
+        <TextView
+            android:id="@+id/groupsToolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/groupsToolbarTitle"
+            android:textColor="#fff"
+            android:textSize="25sp"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/addGroupToolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/addGroupToolbarTitle"
+            android:textColor="#fff"
+            android:textSize="25sp"
+            android:visibility="gone" />
+
 
     </androidx.appcompat.widget.Toolbar>
+
 
     <include
         layout="@layout/content_main"
@@ -37,10 +58,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
+    <!--<include-->
+    <!--layout="@layout/test_layout"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="0dp"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@id/toolbar" />-->
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         app:itemIconTint="@drawable/bottom_navigation_colors"
         app:itemTextColor="@drawable/bottom_navigation_colors"
         app:labelVisibilityMode="labeled"
