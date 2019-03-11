@@ -5,6 +5,9 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import api.Group;
+import api.Teacher;
+
 public class Events {
 
     @SerializedName("time-zone")

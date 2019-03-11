@@ -5,9 +5,4 @@
     android:layout_height="match_parent"
     tools:context=".WeekFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/eventsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"/>
 </FrameLayout>

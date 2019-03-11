@@ -1,10 +1,10 @@
-
-package faculties;
+package api;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Faculties {
+
+public class Main {
 
     @SerializedName("university")
     @Expose
@@ -17,5 +17,4 @@ public class Faculties {
     public void setUniversity(University university) {
         this.university = university;
     }
-
 }

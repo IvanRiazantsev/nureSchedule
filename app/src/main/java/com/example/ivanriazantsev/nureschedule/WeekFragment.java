@@ -26,8 +26,6 @@ public class WeekFragment extends Fragment {
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_week, container, false);
 
-        eventsRecyclerView = view.findViewById(R.id.eventsRecyclerView);
-        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
 

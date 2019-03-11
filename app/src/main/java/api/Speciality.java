@@ -1,20 +1,25 @@
 
-package events;
+package api;
 
+import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Teacher {
+
+public class Speciality {
 
     @SerializedName("id")
     @Expose
     private Integer id;
-    @SerializedName("full_name")
-    @Expose
-    private String fullName;
     @SerializedName("short_name")
     @Expose
     private String shortName;
+    @SerializedName("full_name")
+    @Expose
+    private String fullName;
+    @SerializedName("groups")
+    @Expose
+    private List<Group> groups = null;
 
     public Integer getId() {
         return id;
@@ -22,6 +27,14 @@ public class Teacher {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     public String getFullName() {
@@ -32,12 +45,12 @@ public class Teacher {
         this.fullName = fullName;
     }
 
-    public String getShortName() {
-        return shortName;
+    public List<Group> getGroups() {
+        return groups;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 
 }
