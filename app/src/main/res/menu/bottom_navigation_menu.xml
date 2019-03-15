@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/weekBottomNavigationItem"
         android:icon="@drawable/ic_view_week_black_24dp"
         android:title="@string/weekBottomNavigation" />
+    <item
+        android:id="@+id/groupsBottomNavigationItem"
+        android:icon="@drawable/ic_group_black_24dp"
+        android:title="" />
     <item
         android:id="@+id/semesterBottomNavigationItem"
         android:icon="@drawable/ic_schedule_black_24dp"
@@ -12,7 +17,8 @@
     <item
         android:id="@+id/settingsBottomNavigationItem"
         android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/settingsBottomNavigation" />
+        android:title="@string/settingsBottomNavigation"
+        android:visible="false" />
 
 
 </menu>

@@ -1,23 +1,25 @@
 package com.example.ivanriazantsev.nureschedule;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import api.Main;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import database.AppDatabase;
+import database.GroupDAO;
+import database.TeacherDAO;
+import fr.ganfra.materialspinner.MaterialSpinner;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
     static boolean isAddGroupFragmentOnScreen = false;
 
     BottomNavigationView bottomNavigationView;
+
+    MaterialSpinner spinner;
+    AppDatabase database = App.getDatabase();
+    GroupDAO groupDAO = database.groupDAO();
+    TeacherDAO teacherDAO = database.teacherDAO();
 
 
     @Override
@@ -64,9 +71,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        final InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        if (inputMethodManager.isActive()) {
+            if (getCurrentFocus() != null) {
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -87,6 +106,23 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
 
 
+//        spinner = findViewById(R.id.groupsSpinner);
+//
+//        String[] savedGroupsList = new String[groupDAO.getAll().size()];
+//        String[] savedTeachersList = new String[teacherDAO.getAll().size()];
+//        for (int i = 0; i < savedGroupsList.length; i++) {
+//            savedGroupsList[i] = groupDAO.getAll().get(i).getName();
+//        }
+//        for (int i = 0; i < savedTeachersList.length; i++) {
+//            savedTeachersList[i] = teacherDAO.getAll().get(i).getShortName();
+//        };
+//
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, savedList);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+
+
+
     }
 
 
@@ -94,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
         fm.beginTransaction().add(R.id.main_container, settingsFragment, "settings").hide(settingsFragment).commit();
         fm.beginTransaction().add(R.id.main_container, semesterFragment, "semester").hide(semesterFragment).commit();
         fm.beginTransaction().add(R.id.main_container, groupsFragment, "groups").hide(groupsFragment).commit();
-        fm.beginTransaction().add(R.id.main_container, addGroupFragment, "addGroup").hide(addGroupFragment).commit();
         fm.beginTransaction().add(R.id.main_container, weekFragment, "week").commit();
     }
 

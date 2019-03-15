@@ -7,7 +7,7 @@
             android:id="@+id/calendarToolbarItem"
             android:icon="@drawable/ic_calendar"
             android:title="@string/calendarToolbarItem"
-            app:showAsAction="always" />
+            app:showAsAction="always|withText" />
         <item
             android:id="@+id/groupsToolbarItem"
             android:icon="@drawable/ic_group_black_24dp"

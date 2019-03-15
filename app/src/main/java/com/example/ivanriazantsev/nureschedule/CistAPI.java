@@ -13,7 +13,7 @@ public interface CistAPI {
     @GET("p_api_events_group_json")
     Call<Events> getEventsForGroup(@Query("p_id_group") Integer groupID, @Query("time_from") Long timeFrom, @Query("time_to") Long timeTo, @Query("idClient") String key);
 
-    @GET("http://cist.nure.ua/ias/app/tt/p_api_group_json")
+    @GET("p_api_group_json")
     Call<Main> getGroupsList();
 
     @GET("p_api_podr_json")

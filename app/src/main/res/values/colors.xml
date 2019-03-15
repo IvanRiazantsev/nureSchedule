@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#008577</color>
-    <color name="colorToolbarLight">#4fc3f7</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="colorBottomMenuItemChecked">#4fc3f7</color>
-    <color name="colorBottomMenuItemUnchecked">#bdbdbd</color>
+    <!--<color name="colorToolbarLight">#4fc3f7</color>-->
+    <!--<color name="colorToolbarLight">#212121</color>-->
+    <color name="colorToolbarLight">#363636</color>
+    <!--<color name="colorAccent">#D81B60</color>-->
+    <color name="colorAccent">#fff</color>
+    <!--<color name="colorBottomMenuItemChecked">#4fc3f7</color>-->
+    <!--<color name="colorBottomMenuItemUnchecked">#bdbdbd</color>-->
+    <color name="colorBottomMenuItemChecked">#FFFFFF</color>
+    <color name="colorBottomMenuItemUnchecked">#999999</color>
+    <color name="colorBackground">#1A1B1F</color>
 </resources>

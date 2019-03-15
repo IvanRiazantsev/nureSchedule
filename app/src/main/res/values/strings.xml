@@ -5,9 +5,13 @@
     <string name="calendarToolbarItem">Календарь</string>
     <string name="groupsToolbarItem">Группы</string>
     <string name="settingsBottomNavigation">Настройки</string>
+    <string name="groupsBottomNavigation">Группы</string>
     <string name="groupsToolbarTitle">Группы</string>
     <string name="addGroupToolbarTitle">Добавить</string>
-    <string name="findGroup">Введите группу или преподавателя (і = и)</string>
+    <string name="searchHint">Введите группу или преподавателя (і = и)</string>
+    <string name="searchToolbarItem">Найти</string>
+    <string name="addGroupPlaceholder">Начните писать</string>
+    <string name="groupsPlaceholder">Нет сохраненных групп</string>
 
     <string-array name="catlist">
         <item>Барсик</item>

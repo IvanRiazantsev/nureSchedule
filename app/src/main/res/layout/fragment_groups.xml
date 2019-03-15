@@ -3,9 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="#000"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+
     tools:context=".GroupsFragment">
+
+
+    <TextView
+        android:id="@+id/savedGroupsPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="25sp"
+        android:textColor="#fff"
+        android:gravity="center"
+        android:text="@string/groupsPlaceholder"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/savedGroupsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 
 
@@ -15,6 +31,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:tint="#000"
+        app:rippleColor="@color/colorToolbarLight"
         android:layout_margin="16dp"
         android:src="@drawable/ic_add_black_24dp"/>
 

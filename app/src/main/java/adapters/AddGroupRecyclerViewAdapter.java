@@ -1,19 +1,23 @@
 package adapters;
 
 
+import android.database.sqlite.SQLiteConstraintException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.example.ivanriazantsev.nureschedule.App;
+import com.example.ivanriazantsev.nureschedule.GroupsFragment;
+import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
+
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -21,18 +25,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import api.Teacher;
 import api.Group;
+import database.AppDatabase;
+import database.GroupDAO;
+import database.TeacherDAO;
 
 
-public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRecyclerViewAdapter.AddGroupViewHolder> implements Filterable {
+public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRecyclerViewAdapter.AddGroupViewHolder> {
 
 
     private List<Object> mList = new ArrayList<>();
-    private List<Object> mListFiltered = new ArrayList<>();
+    private AppDatabase database = App.getDatabase();
+    private GroupDAO groupDAO = database.groupDAO();
+    private TeacherDAO teacherDAO = database.teacherDAO();
 
-    //, Collection<Teacher> teachers
-    public void setList(Collection<Group> groups) {
+    public void setList(Collection<Group> groups, Collection<Teacher> teachers) {
         mList.addAll(groups);
-        //mList.addAll(teachers);
+        mList.addAll(teachers);
         notifyDataSetChanged();
     }
 
@@ -58,60 +66,41 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
         return mList.size();
     }
 
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                String str = constraint.toString();
-                if (str.isEmpty())
-                    mListFiltered = mList;
-                else {
-                    List<Object> filteredList = new ArrayList<>();
-                    for (Object object : mList) {
-                        if (object instanceof Group) {
-                            if (((Group) object).getName().toLowerCase().contains(str.toLowerCase())
-                                    || ((Group) object).getName().toLowerCase().contains(str.toLowerCase().replace("і", "и")))
-                                filteredList.add(object);
-                        } else if (object instanceof Teacher) {
-                            if (((Teacher) object).getShortName().toLowerCase().contains(str.toLowerCase())
-                                    || ((Teacher) object).getShortName().toLowerCase().contains(str.toLowerCase().replace("і", "и")))
-                                filteredList.add(object);
-                        } else throw new IllegalArgumentException();
-                    }
-                    mListFiltered = filteredList;
-                }
 
-                FilterResults filterResults = new FilterResults();
-                filterResults.values = mListFiltered;
-                return filterResults;
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                mListFiltered = (ArrayList<Object>) results.values;
-                notifyDataSetChanged();
-            }
-        };
+    public void filterList(List<Object> list) {
+        mList = list;
+        notifyDataSetChanged();
     }
 
 
     class AddGroupViewHolder extends RecyclerView.ViewHolder {
 
         private TextView nameTextView;
-        private ImageButton addImageButton;
-        private ImageButton infoImageButton;
+
 
         public AddGroupViewHolder(View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.nameText);
-            addImageButton = itemView.findViewById(R.id.addGroupButton);
-            infoImageButton = itemView.findViewById(R.id.infoButton);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            nameTextView.setOnClickListener(v -> {
 
+                int position = getAdapterPosition();
+
+                try {
+                    if (mList.get(position) instanceof Group) {
+                        groupDAO.insertGroup((Group) mList.get(position));
+                    }
+                    else if (mList.get(position) instanceof Teacher) {
+                        teacherDAO.insertTeacher((Teacher) mList.get(position));
+                    }
+                    GroupsFragment.adapter.clearList();
+                    GroupsFragment.adapter.setList(groupDAO.getAll(), teacherDAO.getAll());
+                    GroupsFragment.adapter.notifyDataSetChanged();
+                    GroupsFragment fragment = (GroupsFragment)((MainActivity) itemView.getContext()).getSupportFragmentManager().findFragmentByTag("groups");
+                    fragment.placeholder.setVisibility(View.GONE);
+                    Toast.makeText(v.getContext(), "Добавлено", Toast.LENGTH_SHORT).show();
+                } catch (SQLiteConstraintException e) {
+                    Toast.makeText(v.getContext(), "Уже в сохраненных", Toast.LENGTH_SHORT).show();
                 }
             });
         }
