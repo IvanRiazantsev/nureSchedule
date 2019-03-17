@@ -7,11 +7,11 @@
             android:id="@+id/calendarToolbarItem"
             android:icon="@drawable/ic_calendar"
             android:title="@string/calendarToolbarItem"
-            app:showAsAction="always|withText" />
+            app:showAsAction="ifRoom" />
         <item
-            android:id="@+id/groupsToolbarItem"
-            android:icon="@drawable/ic_group_black_24dp"
-            android:title="@string/groupsToolbarItem"
+            android:id="@+id/settingsToolbarItem"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/settingsToolbarItem"
             app:showAsAction="ifRoom" />
     </group>
 

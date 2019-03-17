@@ -2,6 +2,7 @@
 package events;
 
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -75,6 +76,21 @@ public class Events {
 
     public void setTypes(List<Type> types) {
         this.types = types;
+    }
+
+    public Subject getSubjectById(long id) {
+        for (Subject subject : subjects) {
+            if (subject.getId() == id)
+                return subject;
+        }
+        return null;
+    }
+    public Type getTypeById(long id) {
+        for (Type type : types){
+            if (type.getId() == id)
+                return type;
+        }
+        return null;
     }
 
 }

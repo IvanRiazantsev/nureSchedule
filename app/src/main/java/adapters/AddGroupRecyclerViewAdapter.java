@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 
 import com.example.ivanriazantsev.nureschedule.App;
-import com.example.ivanriazantsev.nureschedule.GroupsFragment;
 import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
 
@@ -93,11 +92,11 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
                     else if (mList.get(position) instanceof Teacher) {
                         teacherDAO.insertTeacher((Teacher) mList.get(position));
                     }
-                    GroupsFragment.adapter.clearList();
-                    GroupsFragment.adapter.setList(groupDAO.getAll(), teacherDAO.getAll());
-                    GroupsFragment.adapter.notifyDataSetChanged();
-                    GroupsFragment fragment = (GroupsFragment)((MainActivity) itemView.getContext()).getSupportFragmentManager().findFragmentByTag("groups");
-                    fragment.placeholder.setVisibility(View.GONE);
+                    MainActivity.savedGroupsAdapter.clearList();
+                    MainActivity.savedGroupsAdapter.setList(groupDAO.getAll(), teacherDAO.getAll());
+                    MainActivity.savedGroupsAdapter.notifyDataSetChanged();
+                    MainActivity.savedGroupsPlaceholder.setVisibility(View.GONE);
+
                     Toast.makeText(v.getContext(), "Добавлено", Toast.LENGTH_SHORT).show();
                 } catch (SQLiteConstraintException e) {
                     Toast.makeText(v.getContext(), "Уже в сохраненных", Toast.LENGTH_SHORT).show();

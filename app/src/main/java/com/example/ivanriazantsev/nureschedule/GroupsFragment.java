@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import adapters.SavedGroupsRecyclerViewAdapter;
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +28,6 @@ import database.TeacherDAO;
 public class GroupsFragment extends Fragment {
 
     View view;
-    private FloatingActionButton addGroupButton;
     private RecyclerView savedGroupsRecyclerView;
     public static SavedGroupsRecyclerViewAdapter adapter;
     public static List<Group> savedGroupsList = new ArrayList<>();
@@ -60,9 +58,9 @@ public class GroupsFragment extends Fragment {
 
         placeholder = view.findViewById(R.id.savedGroupsPlaceholder);
 
-        addGroupButton = view.findViewById(R.id.addGroupButton);
+//        addGroupButton = view.findViewById(R.id.addGroupButton);
 
-        addGroupButton.setOnClickListener(addGroupButtonListener);
+//        addGroupButton.setOnClickListener(addGroupButtonListener);
 
         savedGroupsRecyclerView = view.findViewById(R.id.savedGroupsRecyclerView);
         savedGroupsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -85,17 +83,17 @@ public class GroupsFragment extends Fragment {
         return view;
     }
 
-    private View.OnClickListener addGroupButtonListener = v -> {
-        if (!MainActivity.addGroupFragment.isAdded())
-            getActivity().getSupportFragmentManager().beginTransaction().
-                    add(R.id.main_container, MainActivity.addGroupFragment, "addGroup").hide(MainActivity.addGroupFragment).commit();
-        getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.animator.slide_left, R.animator.slide_right).hide(this).
-                show(MainActivity.addGroupFragment).addToBackStack(null).commit();
-        MainActivity.isGroupsFragmentsOnScreen = false;
-        MainActivity.isAddGroupFragmentOnScreen = true;
-        getActivity().findViewById(R.id.groupsToolbarTitle).setVisibility(View.GONE);
-        getActivity().findViewById(R.id.addGroupToolbarTitle).setVisibility(View.VISIBLE);
-    };
+//    private View.OnClickListener addGroupButtonListener = v -> {
+//        if (!MainActivity.addGroupFragment.isAdded())
+//            getActivity().getSupportFragmentManager().beginTransaction().
+//                    add(R.id.main_container, MainActivity.addGroupFragment, "addGroup").hide(MainActivity.addGroupFragment).commit();
+//        getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.animator.slide_left, R.animator.slide_right).hide(this).
+//                show(MainActivity.addGroupFragment).addToBackStack(null).commit();
+//        MainActivity.isGroupsFragmentsOnScreen = false;
+//        MainActivity.isAddGroupFragmentOnScreen = true;
+//        getActivity().findViewById(R.id.groupsToolbarTitle).setVisibility(View.GONE);
+//        getActivity().findViewById(R.id.addGroupToolbarTitle).setVisibility(View.VISIBLE);
+//    };
 
 
 }

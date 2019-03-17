@@ -7,4 +7,20 @@
 
     tools:context=".WeekFragment">
 
+    <TextView
+        android:id="@+id/weekPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/weekPlaceholder"
+        android:textColor="#fff"
+        android:textSize="25sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weekRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
 </FrameLayout>

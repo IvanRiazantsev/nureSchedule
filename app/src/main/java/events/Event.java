@@ -5,7 +5,17 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import adapters.TeachersAndGroupsConverter;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+@Entity
 public class Event {
+
+    @PrimaryKey
+    private Integer id;
+
 
     @SerializedName("subject_id")
     @Expose
@@ -25,9 +35,13 @@ public class Event {
     @SerializedName("auditory")
     @Expose
     private String auditory;
+
+    @TypeConverters({TeachersAndGroupsConverter.class})
     @SerializedName("teachers")
     @Expose
     private List<Integer> teachers = null;
+
+    @TypeConverters({TeachersAndGroupsConverter.class})
     @SerializedName("groups")
     @Expose
     private List<Integer> groups = null;
@@ -96,4 +110,11 @@ public class Event {
         this.groups = groups;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

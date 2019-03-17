@@ -1,29 +1,40 @@
 package adapters;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ivanriazantsev.nureschedule.App;
-import com.example.ivanriazantsev.nureschedule.GroupsFragment;
 import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+
+import androidx.annotation.UiThread;
 import androidx.recyclerview.widget.RecyclerView;
 import api.Group;
-import api.Main;
+
 import api.Teacher;
 import database.AppDatabase;
+import database.EventDAO;
 import database.GroupDAO;
 import database.TeacherDAO;
+import events.Event;
+import events.Events;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGroupsRecyclerViewAdapter.SavedGroupsViewHolder> {
 
@@ -31,6 +42,8 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
     private AppDatabase database = App.getDatabase();
     private GroupDAO groupDAO = database.groupDAO();
     private TeacherDAO teacherDAO = database.teacherDAO();
+    private EventDAO eventDAO = database.eventDAO();
+
 
 
     public void setList(Collection<Group> groups, Collection<Teacher> teachers) {
@@ -61,19 +74,28 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
         return mList.size();
     }
 
-
     class SavedGroupsViewHolder extends RecyclerView.ViewHolder {
 
 
+        private LinearLayout savedGroup;
         private TextView name;
         private ImageButton settingsButton;
         private ImageButton removeButton;
+        private TextView updateDate;
+        private ImageButton refreshButton;
+        private Timer mTimer;
+
 
         public SavedGroupsViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            savedGroup = itemView.findViewById(R.id.savedGroup);
             name = itemView.findViewById(R.id.nameText);
             settingsButton = itemView.findViewById(R.id.settingsImageButton);
             removeButton = itemView.findViewById(R.id.removeImageButton);
+            updateDate = itemView.findViewById(R.id.updateDateText);
+            refreshButton = itemView.findViewById(R.id.refreshImageButton);
+
 
             removeButton.setOnClickListener(v -> {
                 int position = getAdapterPosition();
@@ -84,14 +106,48 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     teacherDAO.deleteTeacher((Teacher) mList.get(position));
                 }
                 mList.remove(position);
-                notifyDataSetChanged();
+                itemView.animate().translationX(itemView.getWidth()).setDuration(100);
 
-                GroupsFragment fragment = (GroupsFragment) ((MainActivity) itemView.getContext()).getSupportFragmentManager().findFragmentByTag("groups");
+                itemView.postDelayed(() -> notifyDataSetChanged(), 100);
+
                 if (mList.isEmpty())
-                    fragment.placeholder.setVisibility(View.VISIBLE);
+                    MainActivity.savedGroupsPlaceholder.setVisibility(View.VISIBLE);
                 else
-                    fragment.placeholder.setVisibility(View.GONE);
+                    MainActivity.savedGroupsPlaceholder.setVisibility(View.GONE);
 
+            });
+
+            refreshButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    eventDAO.deleteAll();
+                    App.getCistAPI().getEventsForGroup(groupDAO.getByName(name.getText().
+                            toString()).getId(),null, null,App.getKey()).enqueue(new Callback<Events>() {
+                        @Override
+                        public void onResponse(Call<Events> call, Response<Events> response) {
+                            if (response.code() == 200) {
+                                List<Event> events = response.body().getEvents();
+                                for (Event event : events) {
+                                    eventDAO.insertEvent(event);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Events> call, Throwable t) {
+                            Toast.makeText(itemView.getContext(),"Ошибка",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+
+            savedGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+
+
+                }
             });
         }
 
@@ -103,7 +159,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
             else
                 throw new IllegalArgumentException();
         }
-
-
     }
 }
+
+

@@ -18,6 +18,9 @@ public interface GroupDAO {
     @Query("SELECT * FROM `group` WHERE id = :id")
     Group getById(long id);
 
+    @Query("SELECT * FROM `group` WHERE name = :name")
+    Group getByName(String name);
+
     @Insert
     void insertGroup(Group group);
 

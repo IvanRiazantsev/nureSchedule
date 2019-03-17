@@ -1,109 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main_layout"
     android:layout_width="match_parent"
     android:background="@color/colorBackground"
-
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <include layout="@layout/activity_main_content"/>
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
+    <include layout="@layout/groups_bottom_sheet"/>
+
+    <include layout="@layout/add_group_bottom_sheet"/>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addGroupButton1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/colorToolbarLight"
-        app:layout_constraintTop_toTopOf="parent">
+        android:src="@drawable/ic_add_black_24dp"
+        android:tint="#000"
+        android:layout_marginEnd="10dp"
+        android:visibility="gone"
+        app:elevation="6dp"
+        app:layout_anchor="@+id/groupsBottomSheet"
+        app:layout_anchorGravity="top|end"
+        app:rippleColor="@color/colorToolbarLight" />
 
-        <fr.ganfra.materialspinner.MaterialSpinner
-            android:id="@+id/groupsSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:entries="@array/catlist"
-            app:ms_arrowColor="#fff"
-            app:ms_baseColor="#fff"
-            android:visibility="gone"
-            app:ms_enableErrorLabel="false"
-            app:ms_enableFloatingLabel="false" />
-
-        <TextView
-            android:id="@+id/groupsToolbarTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/groupsToolbarTitle"
-            android:textColor="#fff"
-            android:textSize="25sp"
-            android:visibility="gone" />
-        <TextView
-            android:id="@+id/addGroupToolbarTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/addGroupToolbarTitle"
-            android:textColor="#fff"
-            android:textSize="25sp"
-            android:visibility="gone" />
-
-
-    </androidx.appcompat.widget.Toolbar>
-
-
-    <include
-        layout="@layout/content_main"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
-
-
-    <com.example.ivanriazantsev.nureschedule.CurvedBottomNavigationView
-        android:id="@+id/bottomNavView"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:visibility="visible"
-        app:itemIconTint="@drawable/bottom_navigation_colors"
-        app:itemTextColor="@drawable/bottom_navigation_colors"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_navigation_menu">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_button"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="center_horizontal"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_group_black_24dp"
-            app:rippleColor="@color/colorToolbarLight"
-            android:tint="#000"
-            app:borderWidth="0dp"
-            app:fabSize="auto"
-            />
-
-
-    </com.example.ivanriazantsev.nureschedule.CurvedBottomNavigationView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/refreshGroupsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_refresh_white_24dp"
+        android:tint="#000"
+        android:layout_marginEnd="76dp"
+        android:visibility="gone"
+        app:elevation="6dp"
+        app:layout_anchor="@+id/groupsBottomSheet"
+        app:layout_anchorGravity="top|end"
+        app:rippleColor="@color/colorToolbarLight" />
 
 
 
-    <!--<com.google.android.material.bottomnavigation.BottomNavigationView-->
-        <!--android:id="@+id/bottomNavView"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="60dp"-->
-        <!--android:visibility="visible"-->
-        <!--app:itemIconTint="@drawable/bottom_navigation_colors"-->
-        <!--app:itemTextColor="@drawable/bottom_navigation_colors"-->
-        <!--app:labelVisibilityMode="labeled"-->
-        <!--android:backgroundTint="@color/colorToolbarLight"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:menu="@menu/bottom_navigation_menu">-->
 
-
-    <!--</com.google.android.material.bottomnavigation.BottomNavigationView>-->
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

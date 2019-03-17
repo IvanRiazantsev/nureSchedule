@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/addGroupBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="250dp"
+    android:background="@color/colorToolbarLight"
+    android:visibility="visible"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="0dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/groupSearchEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:hint="@string/searchHint"
+        android:inputType="textVisiblePassword"
+        android:maxLines="1"
+        android:textColor="#fff"
+        android:textColorHint="#918D8D"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/addGroupPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/addGroupPlaceholder"
+        android:textColor="#fff"
+        android:textSize="25sp"
+        app:layout_constraintTop_toBottomOf="@id/groupSearchEditText"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/groupsTeachersRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/groupSearchEditText"
+        >
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/doneFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_done_black_24dp"
+        android:tint="#000"
+        app:elevation="6dp"
+        app:fabSize="mini"
+        app:rippleColor="@color/colorToolbarLight"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

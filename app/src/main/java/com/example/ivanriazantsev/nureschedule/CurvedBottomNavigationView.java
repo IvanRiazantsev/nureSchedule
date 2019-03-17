@@ -6,6 +6,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.PathShape;
 import android.util.AttributeSet;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -50,7 +53,7 @@ public class CurvedBottomNavigationView extends BottomNavigationView {
         mPath = new Path();
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPaint.setColor(Color.argb(255,33,33,33));
+        mPaint.setColor(Color.argb(255, 54, 54, 54));
         setBackgroundColor(Color.TRANSPARENT);
     }
 
@@ -60,6 +63,12 @@ public class CurvedBottomNavigationView extends BottomNavigationView {
 
         mNavigationBarWidth = getWidth();
         mNavigationBarHeight = getHeight();
+
+        PathShape shape = new PathShape(mPath, mNavigationBarWidth, mNavigationBarHeight);
+        ShapeDrawable drawable = new ShapeDrawable(shape);
+        drawable.setColorFilter(Color.argb(255, 54, 54, 54), PorterDuff.Mode.SRC_IN);
+
+        setBackground(drawable);
 
         mFirstCurveStartPoint.set((mNavigationBarWidth / 2) - (CURVE_CIRCLE_RADIUS * 2) - (CURVE_CIRCLE_RADIUS / 4), 0);
         mFirstCurveEndPoint.set(mNavigationBarWidth / 2, CURVE_CIRCLE_RADIUS + (CURVE_CIRCLE_RADIUS / 4));
@@ -92,7 +101,6 @@ public class CurvedBottomNavigationView extends BottomNavigationView {
         mPath.close();
 
     }
-
 
 
     @Override

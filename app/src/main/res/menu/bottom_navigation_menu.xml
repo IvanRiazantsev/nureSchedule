@@ -14,11 +14,7 @@
         android:id="@+id/semesterBottomNavigationItem"
         android:icon="@drawable/ic_schedule_black_24dp"
         android:title="@string/semesterBottomNavigation" />
-    <item
-        android:id="@+id/settingsBottomNavigationItem"
-        android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/settingsBottomNavigation"
-        android:visible="false" />
+
 
 
 </menu>
