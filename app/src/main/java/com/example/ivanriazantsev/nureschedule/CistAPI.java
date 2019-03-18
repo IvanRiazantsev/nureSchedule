@@ -10,8 +10,9 @@ import retrofit2.http.Query;
 public interface CistAPI {
 
 
-    @GET("p_api_events_group_json")
-    Call<Events> getEventsForGroup(@Query("p_id_group") Integer groupID, @Query("time_from") Long timeFrom, @Query("time_to") Long timeTo, @Query("idClient") String key);
+    @GET("p_api_event_json")
+    Call<Events> getEventsForGroup(@Query("timetable_id") Integer groupID, @Query("type_id") Integer typeId,
+                                   @Query("time_from") Long timeFrom, @Query("time_to") Long timeTo, @Query("idClient") String key);
 
     @GET("p_api_group_json")
     Call<Main> getGroupsList();

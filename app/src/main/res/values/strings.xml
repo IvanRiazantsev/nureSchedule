@@ -13,6 +13,10 @@
     <string name="groupsPlaceholder">Нет сохраненных групп</string>
     <string name="weekPlaceholder">Не выбрано расписание</string>
     <string name="neverUpdated">Не обновлялось</string>
+    <string name="confirmDeletionTitle">Удаление</string>
+    <string name="confirmDeletionMessage">Удалить выбранное расписание?</string>
+    <string name="confirmDeletionYesButton">Удалить</string>
+    <string name="confirmDeletionNoButton">Отмена</string>
 
     <string-array name="catlist">
         <item>Барсик</item>

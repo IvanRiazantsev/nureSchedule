@@ -4,6 +4,16 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorToolbarLight</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
+    <!--<style name="AppTheme.Launcher">-->
+        <!--<item name="android:windowBackground">@drawable/launch_screen</item>-->
+    <!--</style>-->
+
+    <style name="AlertDialogTheme" parent="Theme.MaterialComponents.Dialog.Alert">
+        <item name="colorAccent">#A39316</item>
     </style>
 
 </resources>

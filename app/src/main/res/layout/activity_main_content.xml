@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="@color/colorBackground">
+
+
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorToolbarLight"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <TextView
+            android:id="@+id/settingsToolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/settingsToolbarTitle"
+            android:textColor="#fff"
+            android:textSize="25sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/groupToolbarTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text=""
+            android:textColor="#fff"
+            android:textSize="25sp"
+            android:visibility="gone" />
+
+
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <include
+        layout="@layout/content_main"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+
+    <com.example.ivanriazantsev.nureschedule.CurvedBottomNavigationView
+        android:id="@+id/bottomNavView"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:visibility="visible"
+        app:itemIconTint="@drawable/bottom_navigation_colors"
+        app:itemTextColor="@drawable/bottom_navigation_colors"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_navigation_menu">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_button"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center_horizontal"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_group_black_24dp"
+            android:tint="#000"
+            app:borderWidth="0dp"
+            app:elevation="6dp"
+            app:fabSize="auto"
+            app:rippleColor="@color/colorToolbarLight" />
+
+
+    </com.example.ivanriazantsev.nureschedule.CurvedBottomNavigationView>
+
+
+    <!--<com.google.android.material.bottomnavigation.BottomNavigationView-->
+    <!--android:id="@+id/bottomNavView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="60dp"-->
+    <!--android:visibility="visible"-->
+    <!--app:itemIconTint="@drawable/bottom_navigation_colors"-->
+    <!--app:itemTextColor="@drawable/bottom_navigation_colors"-->
+    <!--app:labelVisibilityMode="labeled"-->
+    <!--android:backgroundTint="@color/colorToolbarLight"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--app:menu="@menu/bottom_navigation_menu">-->
+
+
+    <!--</com.google.android.material.bottomnavigation.BottomNavigationView>-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

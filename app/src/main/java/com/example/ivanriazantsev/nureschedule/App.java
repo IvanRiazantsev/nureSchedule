@@ -5,14 +5,17 @@ import android.graphics.Color;
 
 import java.text.SimpleDateFormat;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 
 import androidx.collection.ArrayMap;
 import androidx.room.Room;
 import database.AppDatabase;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -34,13 +37,16 @@ public class App extends Application {
 
         initializeEventsColors();
 
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(30, TimeUnit.SECONDS)
+                .build();
+
         retrofit = new Retrofit.Builder().baseUrl(API_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient)
                 .build();
 
         cistAPI = retrofit.create(CistAPI.class);
 
-        //TODO: no main thread queries
         database = Room.databaseBuilder(this, AppDatabase.class, "database").allowMainThreadQueries().build();
     }
 
@@ -64,6 +70,46 @@ public class App extends Application {
         SimpleDateFormat simpleDateFormatArrivals = new SimpleDateFormat("HH:mm", locale);
         return simpleDateFormatArrivals.format(getDateFromUnix(unixTime));
     }
+
+    public static String getCurrentFullDate() {
+        SimpleDateFormat simpleDateFormatArrivals = new SimpleDateFormat("dd MMMM yyyy HH:mm", locale);
+        return simpleDateFormatArrivals.format(new Date());
+    }
+
+    public static String getDateForWeek(Long unixTime) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("E, dd MMMM yyyy", locale);
+        return simpleDateFormat.format(getDateFromUnix(unixTime / 1000L));
+    }
+
+    public static Date getStartOfDay(Date date) {
+        Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    public static Date getStartOfDayInAWeek(Date date) {
+        Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 7);
+        return getStartOfDay(calendar.getTime());
+    }
+
+    public static Date[] getWeek(Date date) {
+        Date[] dates = new Date[7];
+        dates[0] = date;
+        Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTime(date);
+        for (int i = 1; i < dates.length; i++) {
+            calendar.add(Calendar.DATE, 1);
+            dates[i] = calendar.getTime();
+        }
+        return dates;
+    }
+
 
     private void initializeEventsColors() {
 //        //Lectures

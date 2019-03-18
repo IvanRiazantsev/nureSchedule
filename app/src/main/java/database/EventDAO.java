@@ -21,11 +21,17 @@ public interface EventDAO {
     @Query("DELETE FROM event")
     void deleteAll();
 
-//    @Query("DELETE FROM event WHERE groups")
-//    void deleteAllForGroup(String group);
+    @Query("DELETE FROM event WHERE forGroup = :group")
+    void deleteAllForGroup(String group);
+
+    @Query("SELECT * FROM event WHERE forGroup = :name AND startTime > :from AND startTime < :to")
+    List<Event> getEventsBetweenTwoDatesForGroup(String name, Integer from, Integer to);
 
     @Insert
     void insertEvent(Event event);
+
+    @Insert
+    void insertEventsList(List<Event> eventList);
 
     @Update
     void updateEvent(Event event);

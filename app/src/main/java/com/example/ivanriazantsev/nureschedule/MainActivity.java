@@ -2,7 +2,6 @@ package com.example.ivanriazantsev.nureschedule;
 
 import adapters.AddGroupRecyclerViewAdapter;
 import adapters.SavedGroupsRecyclerViewAdapter;
-import adapters.WeekSectionAdapter;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -50,6 +49,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
+
     private Toolbar toolbar;
 
     final Fragment weekFragment = new WeekFragment();
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     TeacherDAO teacherDAO = database.teacherDAO();
     FloatingActionButton groupFAB;
     FloatingActionButton addGroupFAB;
-    FloatingActionButton refreshGroupsFAB;
+    public static FloatingActionButton refreshGroupsFAB;
     static BottomSheetBehavior bottomSheetBehaviorSavedGroups;
     static BottomSheetBehavior bottomSheetBehaviorAddGroups;
 
@@ -98,10 +98,14 @@ public class MainActivity extends AppCompatActivity {
         super.onPrepareOptionsMenu(menu);
         MenuItem settings = menu.findItem(R.id.settingsToolbarItem);
         MenuItem calendar = menu.findItem(R.id.calendarToolbarItem);
-        if (!isSettingsOnScreen) {
+        if (!isSettingsOnScreen && active == weekFragment) {
+            settings.setVisible(true);
+            calendar.setVisible(false);
+        } else if(!isSettingsOnScreen && active == semesterFragment) {
             settings.setVisible(true);
             calendar.setVisible(true);
-        } else {
+        }
+        else {
             settings.setVisible(false);
             calendar.setVisible(false);
         }
@@ -166,11 +170,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint({"WrongThread", "RestrictedApi"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+//        database.clearAllTables();
 
         bottomSheetBehaviorSavedGroups = BottomSheetBehavior.from(findViewById(R.id.groupsBottomSheet));
         bottomSheetBehaviorAddGroups = BottomSheetBehavior.from(findViewById(R.id.addGroupBottomSheet));
@@ -204,10 +212,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
 
-        addOnBackPressedCallback(() -> {
-//            switchToolbarContent();
-            return true;
-        });
+        addOnBackPressedCallback(() -> true);
 
 
         bottomNavigationView = findViewById(R.id.bottomNavView);
@@ -225,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("RestrictedApi")
             @Override
             public void onStateChanged(@NonNull View view, int i) {
-                if (i == 4) {
+                if (i == BottomSheetBehavior.STATE_COLLAPSED) {
                     refreshGroupsFAB.setVisibility(View.GONE);
                     addGroupFAB.setVisibility(View.GONE);
                 }
@@ -235,7 +240,8 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("RestrictedApi")
             @Override
             public void onSlide(@NonNull View view, float v) {
-                refreshGroupsFAB.setVisibility(View.VISIBLE);
+                if (savedGroupsPlaceholder.getVisibility() == View.GONE)
+                    refreshGroupsFAB.setVisibility(View.VISIBLE);
                 addGroupFAB.setVisibility(View.VISIBLE);
 
                 refreshGroupsFAB.animate().scaleX(v).scaleY(v).setDuration(0).start();
@@ -249,11 +255,17 @@ public class MainActivity extends AppCompatActivity {
         savedGroupsAdapter = new SavedGroupsRecyclerViewAdapter();
         savedGroupsRecyclerView.setAdapter(savedGroupsAdapter);
 
+
         savedGroupsList.addAll(groupDAO.getAll());
         savedTeachersList.addAll(teacherDAO.getAll());
 
+
         if (!savedGroupsList.isEmpty() || !savedTeachersList.isEmpty()) {
             savedGroupsPlaceholder.setVisibility(View.GONE);
+        }
+        if ((!savedGroupsList.isEmpty() || !savedTeachersList.isEmpty())
+                && bottomSheetBehaviorSavedGroups.getState() != BottomSheetBehavior.STATE_COLLAPSED) {
+            refreshGroupsFAB.setVisibility(View.VISIBLE);
         }
 
 
@@ -335,8 +347,22 @@ public class MainActivity extends AppCompatActivity {
 
         addGroupRecyclerViewAdapter.setList(groupList, teacherList);
 
+        refreshGroupsFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
 
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getCurrentFocus() != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     private void filter(String text) {
@@ -407,12 +433,12 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.weekBottomNavigationItem:
                     fm.beginTransaction().hide(active).show(weekFragment).commit();
                     active = weekFragment;
-                    toolbar.setVisibility(View.VISIBLE);
+                    toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(false);
                     return true;
                 case R.id.semesterBottomNavigationItem:
                     fm.beginTransaction().hide(active).show(semesterFragment).commit();
                     active = semesterFragment;
-                    toolbar.setVisibility(View.VISIBLE);
+                    toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
                     return true;
             }
             return false;

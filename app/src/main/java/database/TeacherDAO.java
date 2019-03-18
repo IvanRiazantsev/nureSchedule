@@ -18,6 +18,15 @@ public interface TeacherDAO {
     @Query("SELECT * FROM teacher WHERE id = :id")
     Teacher getById(long id);
 
+    @Query("SELECT * FROM teacher WHERE shortName = :name")
+    Teacher getByName(String name);
+
+    @Query("UPDATE teacher SET refreshDate = :date WHERE shortName = :name")
+    void updateTeacherRefreshDate(String date, String name);
+
+    @Query("UPDATE teacher SET refreshDate = :date")
+    void updateAllTeachersRefreshDates(String date);
+
     @Insert
     void insertTeacher(Teacher teacher);
 

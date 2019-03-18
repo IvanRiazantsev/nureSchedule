@@ -20,6 +20,8 @@ public class Group {
     @Expose
     private String name;
 
+    private String refreshDate = null;
+
     public Integer getId() {
         return id;
     }
@@ -36,4 +38,11 @@ public class Group {
         this.name = name;
     }
 
+    public String getRefreshDate() {
+        return refreshDate;
+    }
+
+    public void setRefreshDate(String refreshDate) {
+        this.refreshDate = refreshDate;
+    }
 }

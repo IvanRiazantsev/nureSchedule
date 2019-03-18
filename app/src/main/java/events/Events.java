@@ -85,8 +85,9 @@ public class Events {
         }
         return null;
     }
+
     public Type getTypeById(long id) {
-        for (Type type : types){
+        for (Type type : types) {
             if (type.getId() == id)
                 return type;
         }

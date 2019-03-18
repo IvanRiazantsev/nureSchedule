@@ -13,10 +13,11 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import adapters.WeekSectionAdapter;
+import adapters.WeekSection;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 
 public class WeekFragment extends Fragment {
@@ -26,8 +27,8 @@ public class WeekFragment extends Fragment {
     Timer mTimer;
     MyTimerTask mTimerTask;
 
-    private RecyclerView weekRecyclerView;
-    private WeekSectionAdapter weekAdapter;
+    public static RecyclerView weekRecyclerView;
+    public static SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
 
 
     public WeekFragment() {
@@ -44,7 +45,7 @@ public class WeekFragment extends Fragment {
 
         weekRecyclerView = view.findViewById(R.id.weekRecyclerView);
         weekRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        weekAdapter = new WeekSectionAdapter();
+//        SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
 
 
 

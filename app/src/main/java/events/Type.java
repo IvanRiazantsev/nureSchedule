@@ -4,8 +4,13 @@ package events;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class Type {
 
+    @PrimaryKey
     @SerializedName("id")
     @Expose
     private Integer id;

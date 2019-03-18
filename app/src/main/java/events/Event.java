@@ -2,6 +2,7 @@
 package events;
 
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -15,6 +16,8 @@ public class Event {
 
     @PrimaryKey
     private Integer id;
+
+    private String forGroup;
 
 
     @SerializedName("subject_id")
@@ -116,5 +119,13 @@ public class Event {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getForGroup() {
+        return forGroup;
+    }
+
+    public void setForGroup(String forGroup) {
+        this.forGroup = forGroup;
     }
 }

@@ -8,6 +8,7 @@
     android:background="@color/colorToolbarLight"
     android:visibility="visible"
     app:behavior_hideable="false"
+    android:elevation="16dp"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
@@ -55,8 +56,8 @@
         app:fabSize="mini"
         app:rippleColor="@color/colorToolbarLight"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />

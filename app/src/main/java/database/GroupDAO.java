@@ -21,6 +21,12 @@ public interface GroupDAO {
     @Query("SELECT * FROM `group` WHERE name = :name")
     Group getByName(String name);
 
+    @Query("UPDATE `group` SET refreshDate = :date WHERE name = :name")
+    void updateGroupRefreshDate(String date, String name);
+
+    @Query("UPDATE `group` SET refreshDate = :date")
+    void updateAllGroupsRefreshDates(String date);
+
     @Insert
     void insertGroup(Group group);
 

@@ -1,6 +1,7 @@
 package adapters;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -11,11 +12,14 @@ public class TeachersAndGroupsConverter {
     @TypeConverter
     public String from(List<Integer> list) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Integer integer : list) {
-            stringBuilder.append(integer).append(",");
+        Iterator<Integer> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            stringBuilder.append(iterator.next());
+            if (iterator.hasNext()) {
+                stringBuilder.append(",");
+            }
         }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        return stringBuilder.toString();
+       return stringBuilder.toString();
     }
 
     @TypeConverter

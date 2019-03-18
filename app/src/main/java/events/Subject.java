@@ -5,8 +5,15 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class Subject {
 
+
+    @PrimaryKey
     @SerializedName("id")
     @Expose
     private Integer id;
@@ -16,6 +23,8 @@ public class Subject {
     @SerializedName("title")
     @Expose
     private String title;
+
+    @Ignore
     @SerializedName("hours")
     @Expose
     private List<Hour> hours = null;

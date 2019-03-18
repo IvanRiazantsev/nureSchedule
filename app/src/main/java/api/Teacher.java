@@ -23,6 +23,8 @@ public class Teacher {
     @Expose
     private String fullName;
 
+    private String refreshDate = null;
+
     public Integer getId() {
         return id;
     }
@@ -47,4 +49,11 @@ public class Teacher {
         this.fullName = fullName;
     }
 
+    public String getRefreshDate() {
+        return refreshDate;
+    }
+
+    public void setRefreshDate(String refreshDate) {
+        this.refreshDate = refreshDate;
+    }
 }

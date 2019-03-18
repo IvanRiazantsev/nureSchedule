@@ -11,28 +11,29 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import database.SubjectDAO;
+import database.TypeDAO;
 import events.Event;
 import events.Events;
 import events.Type;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
-public class WeekSectionAdapter extends StatelessSection {
+public class WeekSection extends StatelessSection {
 
     String date;
     List<Event> eventList;
-    Events events;
+    private SubjectDAO subjectDAO = App.getDatabase().subjectDAO();
+    private TypeDAO typeDAO = App.getDatabase().typeDAO();
 
-    public WeekSectionAdapter(String date, List<Event> callList, Events events) {
-        // call constructor with layout resources for this Section header, footer and items
+    public WeekSection(String date, List<Event> eventList) {
         super(SectionParameters.builder()
                 .itemResourceId(R.layout.week_recycler_item)
                 .headerResourceId(R.layout.section_header)
                 .build());
 
         this.date = date;
-        this.eventList = callList;
-        this.events = events;
+        this.eventList = eventList;
     }
 
 
@@ -50,12 +51,11 @@ public class WeekSectionAdapter extends StatelessSection {
     public void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
         MyItemViewHolder itemHolder = (MyItemViewHolder) holder;
 
-        // bind your view here
         Event event = eventList.get(position);
-        Type type = events.getTypeById(event.getType());
+        Type type = typeDAO.getById(event.getType());
         itemHolder.timeStart.setText(App.getHoursAndMinutesTimeFromUnix(event.getStartTime() * 1000L));
         itemHolder.timeEnd.setText(App.getHoursAndMinutesTimeFromUnix(event.getEndTime() * 1000L));
-        itemHolder.eventName.setText(events.getSubjectById(event.getSubjectId()).getTitle());
+        itemHolder.eventName.setText(subjectDAO.getById(event.getSubjectId()).getTitle());
         itemHolder.eventRoom.setText(event.getAuditory());
         itemHolder.eventType.setText(type.getShortName());
 

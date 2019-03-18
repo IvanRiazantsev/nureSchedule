@@ -1,6 +1,7 @@
 package adapters;
 
 
+import android.annotation.SuppressLint;
 import android.database.sqlite.SQLiteConstraintException;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +78,7 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
         private TextView nameTextView;
 
 
+        @SuppressLint("RestrictedApi")
         public AddGroupViewHolder(View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.nameText);
@@ -87,15 +89,18 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
 
                 try {
                     if (mList.get(position) instanceof Group) {
+                        ((Group) mList.get(position)).setRefreshDate("Не обновлялось");
                         groupDAO.insertGroup((Group) mList.get(position));
                     }
                     else if (mList.get(position) instanceof Teacher) {
+                        ((Teacher) mList.get(position)).setRefreshDate("Не обновлялось");
                         teacherDAO.insertTeacher((Teacher) mList.get(position));
                     }
                     MainActivity.savedGroupsAdapter.clearList();
                     MainActivity.savedGroupsAdapter.setList(groupDAO.getAll(), teacherDAO.getAll());
                     MainActivity.savedGroupsAdapter.notifyDataSetChanged();
                     MainActivity.savedGroupsPlaceholder.setVisibility(View.GONE);
+                    MainActivity.refreshGroupsFAB.setVisibility(View.VISIBLE);
 
                     Toast.makeText(v.getContext(), "Добавлено", Toast.LENGTH_SHORT).show();
                 } catch (SQLiteConstraintException e) {
@@ -115,6 +120,7 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
         }
 
     }
+
 
 
 }
