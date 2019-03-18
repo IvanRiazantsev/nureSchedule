@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 
@@ -68,21 +69,25 @@ public class App extends Application {
 
     public static String getHoursAndMinutesTimeFromUnix(Long unixTime) {
         SimpleDateFormat simpleDateFormatArrivals = new SimpleDateFormat("HH:mm", locale);
+        simpleDateFormatArrivals.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
         return simpleDateFormatArrivals.format(getDateFromUnix(unixTime));
     }
 
     public static String getCurrentFullDate() {
         SimpleDateFormat simpleDateFormatArrivals = new SimpleDateFormat("dd MMMM yyyy HH:mm", locale);
+        simpleDateFormatArrivals.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
         return simpleDateFormatArrivals.format(new Date());
     }
 
     public static String getDateForWeek(Long unixTime) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("E, dd MMMM yyyy", locale);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
         return simpleDateFormat.format(getDateFromUnix(unixTime / 1000L));
     }
 
     public static Date getStartOfDay(Date date) {
         Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
@@ -93,6 +98,7 @@ public class App extends Application {
 
     public static Date getStartOfDayInAWeek(Date date) {
         Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
         calendar.setTime(date);
         calendar.add(Calendar.DATE, 7);
         return getStartOfDay(calendar.getTime());
@@ -102,6 +108,7 @@ public class App extends Application {
         Date[] dates = new Date[7];
         dates[0] = date;
         Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
         calendar.setTime(date);
         for (int i = 1; i < dates.length; i++) {
             calendar.add(Calendar.DATE, 1);

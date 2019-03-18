@@ -20,6 +20,7 @@ import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
 import com.example.ivanriazantsev.nureschedule.WeekFragment;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -41,6 +42,7 @@ import database.EventDAO;
 import database.GroupDAO;
 import database.SubjectDAO;
 import database.TeacherDAO;
+import database.TypeDAO;
 import events.Event;
 import events.Events;
 import retrofit2.Call;
@@ -55,6 +57,8 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
     private GroupDAO groupDAO = database.groupDAO();
     private TeacherDAO teacherDAO = database.teacherDAO();
     private EventDAO eventDAO = database.eventDAO();
+    private TypeDAO typeDAO = database.typeDAO();
+    private SubjectDAO subjectDAO = database.subjectDAO();
 
 
     public void setList(Collection<Group> groups, Collection<Teacher> teachers) {
@@ -161,12 +165,17 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     @Override
                     public void onResponse(Call<Events> call, Response<Events> response) {
                         if (response.code() == 200) {
+                            typeDAO.insertTypesList(response.body().getTypes());
+                            subjectDAO.insertSubjectsList(response.body().getSubjects());
                             eventDAO.deleteAllForGroup(name.getText().toString());
                             List<Event> events = response.body().getEvents();
                             for (Event event : events) {
                                 event.setForGroup(name.getText().toString());
                             }
                             eventDAO.insertEventsList(events);
+                            if (!updateDate.getText().toString().equals("Не обновлялось")) {
+                                savedGroupOrTeacher.callOnClick();
+                            }
                             String refreshDateString = "Обновлено " + App.getCurrentFullDate();
                             updateDate.setText(refreshDateString);
                             if (instance instanceof Group)
@@ -187,6 +196,8 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                         Toast.makeText(itemView.getContext(), "Ошибка", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+
             });
 
             savedGroupOrTeacher.setOnClickListener(v -> {
@@ -208,11 +219,10 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 List<Event> sixthDay = new ArrayList<>();
                 List<Event> seventhDay = new ArrayList<>();
 
-                Date[] dates = App.getWeek(currentDate);
+                Date[] dates = App.getWeek(currentDay);
                 ArrayList<List<Event>> eventsByDaysList = new ArrayList<>();
 
                 for (Event event : eventsForWeek) {
-
                     if (event.getStartTime() < dates[1].getTime() / 1000)
                         firstDay.add(event);
                     else if (event.getStartTime() < dates[2].getTime() / 1000)
@@ -229,6 +239,15 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                         seventhDay.add(event);
                 }
 
+                removeDuplicates(firstDay);
+                removeDuplicates(secondDay);
+                removeDuplicates(thirdDay);
+                removeDuplicates(fourthDay);
+                removeDuplicates(fifthDay);
+                removeDuplicates(sixthDay);
+                removeDuplicates(seventhDay);
+
+
                 eventsByDaysList.add(0, firstDay);
                 eventsByDaysList.add(1, secondDay);
                 eventsByDaysList.add(2, thirdDay);
@@ -237,6 +256,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 eventsByDaysList.add(5, sixthDay);
                 eventsByDaysList.add(6, seventhDay);
 
+                WeekFragment.sectionAdapter.removeAllSections();
                 WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[0].getTime()), eventsByDaysList.get(0)));
                 WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[1].getTime()), eventsByDaysList.get(1)));
                 WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[2].getTime()), eventsByDaysList.get(2)));
@@ -245,9 +265,18 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[5].getTime()), eventsByDaysList.get(5)));
                 WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[6].getTime()), eventsByDaysList.get(6)));
 
+
                 WeekFragment.weekRecyclerView.setAdapter(WeekFragment.sectionAdapter);
 
+
+                MainActivity.selectedScheduleName.setText(name.getText());
+                MainActivity.selectedScheduleName.setVisibility(View.VISIBLE);
+
+                WeekFragment.weekPlaceholder.setVisibility(View.GONE);
+
             });
+
+
         }
 
         public void bind(Object object) {
@@ -260,7 +289,20 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
             } else
                 throw new IllegalArgumentException();
         }
+
+        public void removeDuplicates(List<Event> list) {
+            for (int i = 0; i < list.size(); i++) {
+                if (i + 1 != list.size()) {
+                    if (list.get(i).getSubjectId().equals(list.get(i + 1).getSubjectId())
+                            && list.get(i).getNumberPair().equals(list.get(i + 1).getNumberPair())) {
+                        list.get(i).setAuditory(list.get(i).getAuditory() + ", " + list.get(i + 1).getAuditory());
+                        list.remove(i + 1);
+                    }
+                }
+            }
+        }
     }
+
 
 }
 

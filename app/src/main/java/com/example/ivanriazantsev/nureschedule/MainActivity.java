@@ -86,6 +86,9 @@ public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton doneFAB;
 
+    public static TextView selectedScheduleName;
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -121,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.settingsToolbarItem:
                 isSettingsOnScreen = true;
+                selectedScheduleName.setVisibility(View.GONE);
                 onPrepareOptionsMenu(toolbar.getMenu());
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -156,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if (isSettingsOnScreen) {
             isSettingsOnScreen = false;
+//            selectedScheduleName.setVisibility(View.VISIBLE);
             onPrepareOptionsMenu(toolbar.getMenu());
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             getSupportActionBar().setDisplayShowHomeEnabled(false);
@@ -178,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-//        database.clearAllTables();
+        database.clearAllTables();
 
         bottomSheetBehaviorSavedGroups = BottomSheetBehavior.from(findViewById(R.id.groupsBottomSheet));
         bottomSheetBehaviorAddGroups = BottomSheetBehavior.from(findViewById(R.id.addGroupBottomSheet));
@@ -353,11 +358,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        selectedScheduleName = findViewById(R.id.selectedScheduleName);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (getCurrentFocus() != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
         if (getCurrentFocus() != null) {
             InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),

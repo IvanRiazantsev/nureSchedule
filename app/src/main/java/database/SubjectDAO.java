@@ -22,6 +22,10 @@ public interface SubjectDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertSubject(Subject subject);
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertSubjectsList(List<Subject> subjects);
+
+
     @Update
     void updateSubject(Subject subject);
 

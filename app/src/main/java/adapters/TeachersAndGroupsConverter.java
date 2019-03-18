@@ -19,16 +19,19 @@ public class TeachersAndGroupsConverter {
                 stringBuilder.append(",");
             }
         }
-       return stringBuilder.toString();
+        return stringBuilder.toString();
     }
 
     @TypeConverter
     public List<Integer> to(String data) {
-        String[] strings = data.split(",");
-        Integer[] integers = new Integer[strings.length];
-        for (int i = 0; i < integers.length; i++) {
-            integers[i] = Integer.parseInt(strings[i]);
-        }
-        return Arrays.asList(integers);
+        if (!data.isEmpty()) {
+            String[] strings = data.split(",");
+            Integer[] integers = new Integer[strings.length];
+            for (int i = 0; i < integers.length; i++) {
+                integers[i] = Integer.parseInt(strings[i]);
+            }
+
+            return Arrays.asList(integers);
+        } else return null;
     }
 }

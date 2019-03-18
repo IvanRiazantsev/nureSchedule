@@ -53,8 +53,8 @@ public class WeekSection extends StatelessSection {
 
         Event event = eventList.get(position);
         Type type = typeDAO.getById(event.getType());
-        itemHolder.timeStart.setText(App.getHoursAndMinutesTimeFromUnix(event.getStartTime() * 1000L));
-        itemHolder.timeEnd.setText(App.getHoursAndMinutesTimeFromUnix(event.getEndTime() * 1000L));
+        itemHolder.timeStart.setText(App.getHoursAndMinutesTimeFromUnix((long)event.getStartTime()));
+        itemHolder.timeEnd.setText(App.getHoursAndMinutesTimeFromUnix((long)event.getEndTime()));
         itemHolder.eventName.setText(subjectDAO.getById(event.getSubjectId()).getTitle());
         itemHolder.eventRoom.setText(event.getAuditory());
         itemHolder.eventType.setText(type.getShortName());
@@ -65,7 +65,7 @@ public class WeekSection extends StatelessSection {
 
     @Override
     public RecyclerView.ViewHolder getHeaderViewHolder(View view) {
-        return super.getHeaderViewHolder(view);
+        return new MyHeaderViewHolder(view);
     }
 
     @Override
@@ -84,6 +84,7 @@ public class WeekSection extends StatelessSection {
         private TextView eventRoom;
 
 
+
         public MyItemViewHolder(View itemView) {
             super(itemView);
 
@@ -93,6 +94,7 @@ public class WeekSection extends StatelessSection {
             eventName = itemView.findViewById(R.id.weekEventName);
             eventType = itemView.findViewById(R.id.weekEventType);
             eventRoom = itemView.findViewById(R.id.weekEventRoom);
+
 
         }
     }

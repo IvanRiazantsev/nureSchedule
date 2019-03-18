@@ -22,6 +22,9 @@ public interface TypeDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertType(Type type);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertTypesList(List<Type> types);
+
     @Update
     void updateType(Type type);
 

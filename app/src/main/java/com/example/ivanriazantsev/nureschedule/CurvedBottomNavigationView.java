@@ -64,11 +64,11 @@ public class CurvedBottomNavigationView extends BottomNavigationView {
         mNavigationBarWidth = getWidth();
         mNavigationBarHeight = getHeight();
 
-        PathShape shape = new PathShape(mPath, mNavigationBarWidth, mNavigationBarHeight);
-        ShapeDrawable drawable = new ShapeDrawable(shape);
-        drawable.setColorFilter(Color.argb(255, 54, 54, 54), PorterDuff.Mode.SRC_IN);
-
-        setBackground(drawable);
+//        PathShape shape = new PathShape(mPath, mNavigationBarWidth, mNavigationBarHeight);
+//        ShapeDrawable drawable = new ShapeDrawable(shape);
+//        drawable.setColorFilter(Color.argb(255, 54, 54, 54), PorterDuff.Mode.SRC_IN);
+//
+//        setBackground(drawable);
 
         mFirstCurveStartPoint.set((mNavigationBarWidth / 2) - (CURVE_CIRCLE_RADIUS * 2) - (CURVE_CIRCLE_RADIUS / 4), 0);
         mFirstCurveEndPoint.set(mNavigationBarWidth / 2, CURVE_CIRCLE_RADIUS + (CURVE_CIRCLE_RADIUS / 4));

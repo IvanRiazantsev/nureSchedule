@@ -23,6 +23,7 @@ public class Type {
     @SerializedName("id_base")
     @Expose
     private Integer idBase;
+
     @SerializedName("type")
     @Expose
     private String type;

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -29,6 +30,7 @@ public class WeekFragment extends Fragment {
 
     public static RecyclerView weekRecyclerView;
     public static SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
+    public static TextView weekPlaceholder;
 
 
     public WeekFragment() {
@@ -42,10 +44,10 @@ public class WeekFragment extends Fragment {
 
         view.setOnClickListener(onOutsideClickListener);
 
+        weekPlaceholder = view.findViewById(R.id.weekPlaceholder);
 
         weekRecyclerView = view.findViewById(R.id.weekRecyclerView);
         weekRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
 
 
 

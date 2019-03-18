@@ -17,6 +17,7 @@
     <string name="confirmDeletionMessage">Удалить выбранное расписание?</string>
     <string name="confirmDeletionYesButton">Удалить</string>
     <string name="confirmDeletionNoButton">Отмена</string>
+    <string name="noEvents">Нет пар</string>
 
     <string-array name="catlist">
         <item>Барсик</item>
