@@ -22,6 +22,8 @@ public class Group {
 
     private String refreshDate = null;
 
+    private Boolean isSelected = false;
+
     public Integer getId() {
         return id;
     }
@@ -44,5 +46,13 @@ public class Group {
 
     public void setRefreshDate(String refreshDate) {
         this.refreshDate = refreshDate;
+    }
+
+    public Boolean getSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(Boolean selected) {
+        isSelected = selected;
     }
 }

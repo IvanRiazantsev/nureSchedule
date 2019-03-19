@@ -24,8 +24,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -40,6 +45,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton groupFAB;
     FloatingActionButton addGroupFAB;
     public static FloatingActionButton refreshGroupsFAB;
-    static BottomSheetBehavior bottomSheetBehaviorSavedGroups;
+    public static BottomSheetBehavior bottomSheetBehaviorSavedGroups;
     static BottomSheetBehavior bottomSheetBehaviorAddGroups;
 
 
@@ -90,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_main_menu, menu);
@@ -104,11 +111,10 @@ public class MainActivity extends AppCompatActivity {
         if (!isSettingsOnScreen && active == weekFragment) {
             settings.setVisible(true);
             calendar.setVisible(false);
-        } else if(!isSettingsOnScreen && active == semesterFragment) {
+        } else if (!isSettingsOnScreen && active == semesterFragment) {
             settings.setVisible(true);
             calendar.setVisible(true);
-        }
-        else {
+        } else {
             settings.setVisible(false);
             calendar.setVisible(false);
         }
@@ -183,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        database.clearAllTables();
+//        database.clearAllTables();
 
         bottomSheetBehaviorSavedGroups = BottomSheetBehavior.from(findViewById(R.id.groupsBottomSheet));
         bottomSheetBehaviorAddGroups = BottomSheetBehavior.from(findViewById(R.id.addGroupBottomSheet));
@@ -359,27 +365,25 @@ public class MainActivity extends AppCompatActivity {
         });
 
         selectedScheduleName = findViewById(R.id.selectedScheduleName);
+        if (groupDAO.getSelected() != null) {
+            selectedScheduleName.setText(groupDAO.getSelected().getName());
+            selectedScheduleName.setVisibility(View.VISIBLE);
+        }
+
+
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (getCurrentFocus() != null) {
-            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+        toolbar.requestFocus();
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        if (getCurrentFocus() != null) {
-            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+        toolbar.requestFocus();
     }
 
     private void filter(String text) {

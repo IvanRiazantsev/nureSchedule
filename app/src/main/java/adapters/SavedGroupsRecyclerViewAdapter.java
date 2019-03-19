@@ -3,6 +3,10 @@ package adapters;
 
 import android.annotation.SuppressLint;
 
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +23,9 @@ import com.example.ivanriazantsev.nureschedule.App;
 import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
 import com.example.ivanriazantsev.nureschedule.WeekFragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,6 +42,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import api.Group;
 
+import api.Main;
 import api.Teacher;
 import database.AppDatabase;
 import database.EventDAO;
@@ -45,6 +52,7 @@ import database.TeacherDAO;
 import database.TypeDAO;
 import events.Event;
 import events.Events;
+import events.Subject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -126,9 +134,8 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                         teacherDAO.deleteTeacher((Teacher) mList.get(position));
                     }
                     mList.remove(position);
-                    itemView.animate().translationX(itemView.getWidth()).setDuration(100);
 
-                    itemView.postDelayed(() -> notifyDataSetChanged(), 100);
+                    notifyItemRemoved(position);
 
                     if (mList.isEmpty()) {
                         MainActivity.savedGroupsPlaceholder.setVisibility(View.VISIBLE);
@@ -205,11 +212,30 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     Toast.makeText(itemView.getContext(), "Обновите расписание", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+
+//                @SuppressLint("HandlerLeak") Handler handler = new Handler() {
+//                    @Override
+//                    public void handleMessage(Message msg) {
+//                        super.handleMessage(msg);
+//                        if (msg.what == 1)
+//                            WeekFragment.weekRecyclerView.setAdapter(WeekFragment.sectionAdapter);
+//                    }
+//                };
+//                new Thread(() -> {
                 Date currentDate = new Date();
                 Date currentDay = App.getStartOfDay(currentDate);
                 Date dayInAWeek = App.getStartOfDayInAWeek(currentDate);
                 List<Event> eventsForWeek = eventDAO.getEventsBetweenTwoDatesForGroup(name.getText().toString(),
                         (int) (currentDay.getTime() / 1000L), (int) (dayInAWeek.getTime() / 1000L));
+
+                for (int i = 0; i < eventsForWeek.size(); i++) {
+                    List<Integer> list = eventsForWeek.get(i).getGroups();
+                    if (!list.contains(groupDAO.getByName(name.getText().toString()).getId())) {
+                        eventsForWeek.remove(i);
+                        i--;
+                    }
+                }
 
                 List<Event> firstDay = new ArrayList<>();
                 List<Event> secondDay = new ArrayList<>();
@@ -239,6 +265,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                         seventhDay.add(event);
                 }
 
+
                 removeDuplicates(firstDay);
                 removeDuplicates(secondDay);
                 removeDuplicates(thirdDay);
@@ -265,14 +292,20 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[5].getTime()), eventsByDaysList.get(5)));
                 WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[6].getTime()), eventsByDaysList.get(6)));
 
+//                    handler.sendEmptyMessage(1);
+
+
+//                }).start();
+
 
                 WeekFragment.weekRecyclerView.setAdapter(WeekFragment.sectionAdapter);
-
-
                 MainActivity.selectedScheduleName.setText(name.getText());
                 MainActivity.selectedScheduleName.setVisibility(View.VISIBLE);
+                MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
                 WeekFragment.weekPlaceholder.setVisibility(View.GONE);
+
+                groupDAO.updateIsSelected(true, name.getText().toString());
 
             });
 
@@ -290,13 +323,20 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 throw new IllegalArgumentException();
         }
 
-        public void removeDuplicates(List<Event> list) {
+        void removeDuplicates(List<Event> list) {
             for (int i = 0; i < list.size(); i++) {
                 if (i + 1 != list.size()) {
                     if (list.get(i).getSubjectId().equals(list.get(i + 1).getSubjectId())
-                            && list.get(i).getNumberPair().equals(list.get(i + 1).getNumberPair())) {
+                            && list.get(i).getNumberPair().equals(list.get(i + 1).getNumberPair())
+                            && list.get(i).getType().equals(list.get(i + 1).getType())) {
                         list.get(i).setAuditory(list.get(i).getAuditory() + ", " + list.get(i + 1).getAuditory());
+                        List<Integer> teachers = list.get(i).getTeachers();
+                        if (list.get(i + 1).getTeachers() != null) {
+                            teachers.addAll(list.get(i + 1).getTeachers());
+                            list.get(i).setTeachers(teachers);
+                        }
                         list.remove(i + 1);
+                        i--;
                     }
                 }
             }
@@ -305,5 +345,6 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
 
 
 }
+
 
 

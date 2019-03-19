@@ -27,8 +27,15 @@ public interface GroupDAO {
     @Query("UPDATE `group` SET refreshDate = :date")
     void updateAllGroupsRefreshDates(String date);
 
+    @Query("UPDATE `group` SET isSelected = :isSelected WHERE name = :name")
+    void updateIsSelected(Boolean isSelected, String name);
+
+    @Query("SELECT * FROM `group` WHERE isSelected = 1")
+    Group getSelected();
+
     @Insert
     void insertGroup(Group group);
+
 
     @Update
     void updateGroup(Group group);

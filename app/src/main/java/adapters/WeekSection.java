@@ -1,13 +1,18 @@
 package adapters;
 
+import android.util.ArrayMap;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.ivanriazantsev.nureschedule.App;
 import com.example.ivanriazantsev.nureschedule.R;
+import com.example.ivanriazantsev.nureschedule.WeekFragment;
 import com.google.android.material.card.MaterialCardView;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,8 +28,11 @@ public class WeekSection extends StatelessSection {
 
     String date;
     List<Event> eventList;
+    List<Event> eventListCopy = new ArrayList<>();
     private SubjectDAO subjectDAO = App.getDatabase().subjectDAO();
     private TypeDAO typeDAO = App.getDatabase().typeDAO();
+    ArrayMap<Event, List<Event>> simultaneousEvents = new ArrayMap<>();
+
 
     public WeekSection(String date, List<Event> eventList) {
         super(SectionParameters.builder()
@@ -34,7 +42,23 @@ public class WeekSection extends StatelessSection {
 
         this.date = date;
         this.eventList = eventList;
+        for (int i = 0; i < eventList.size(); i++) {
+            Integer startTime = eventList.get(i).getStartTime();
+            Event current = eventList.get(i);
+            List<Event> events = new ArrayList<>();
+            for (int j = i + 1; j < eventList.size(); j++) {
+                if (startTime.equals(eventList.get(j).getStartTime())) {
+                    events.add(eventList.get(j));
+                    eventList.remove(j);
+                    j--;
+                }
+            }
+            simultaneousEvents.put(current, events);
+        }
+        eventListCopy.addAll(eventList);
     }
+
+
 
 
     @Override
@@ -50,17 +74,62 @@ public class WeekSection extends StatelessSection {
     @Override
     public void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
         MyItemViewHolder itemHolder = (MyItemViewHolder) holder;
+        itemHolder.nextAlternativeButton.setVisibility(View.INVISIBLE);
+        itemHolder.divider.setVisibility(View.INVISIBLE);
 
         Event event = eventList.get(position);
         Type type = typeDAO.getById(event.getType());
-        itemHolder.timeStart.setText(App.getHoursAndMinutesTimeFromUnix((long)event.getStartTime()));
-        itemHolder.timeEnd.setText(App.getHoursAndMinutesTimeFromUnix((long)event.getEndTime()));
+        itemHolder.timeStart.setText(App.getHoursAndMinutesTimeFromUnix((long) event.getStartTime()));
+        itemHolder.timeEnd.setText(App.getHoursAndMinutesTimeFromUnix((long) event.getEndTime()));
         itemHolder.eventName.setText(subjectDAO.getById(event.getSubjectId()).getTitle());
         itemHolder.eventRoom.setText(event.getAuditory());
         itemHolder.eventType.setText(type.getShortName());
 
         itemHolder.cardView.setCardBackgroundColor(App.eventsColors.get(type.getType()));
 
+
+        if (!simultaneousEvents.containsKey(event)) {
+            event = eventListCopy.get(position);
+        }
+
+
+        int size = simultaneousEvents.get(event).size();
+
+
+        if (size != 0) {
+            itemHolder.nextAlternativeButton.setVisibility(View.VISIBLE);
+            itemHolder.divider.setVisibility(View.VISIBLE);
+        }
+
+
+        Event finalEvent = event;
+        itemHolder.nextAlternativeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int current = -1;
+                for (int i = 0; i < size; i++) {
+                    if (itemHolder.eventRoom.getText().toString().equals(simultaneousEvents.get(finalEvent).get(i).getAuditory())) {
+                        current = i;
+                        break;
+                    }
+                }
+                if (current != size - 1) {
+                    eventList.set(position, simultaneousEvents.get(finalEvent).get(current + 1));
+                } else {
+                    eventList.set(position, finalEvent);
+                }
+                Type type = typeDAO.getById(finalEvent.getType());
+                itemHolder.timeStart.setText(App.getHoursAndMinutesTimeFromUnix((long) finalEvent.getStartTime()));
+                itemHolder.timeEnd.setText(App.getHoursAndMinutesTimeFromUnix((long) finalEvent.getEndTime()));
+                itemHolder.eventName.setText(subjectDAO.getById(finalEvent.getSubjectId()).getTitle());
+                itemHolder.eventRoom.setText(finalEvent.getAuditory());
+                itemHolder.eventType.setText(type.getShortName());
+
+                itemHolder.cardView.setCardBackgroundColor(App.eventsColors.get(type.getType()));
+
+                WeekFragment.sectionAdapter.notifyItemChangedInSection(WeekSection.this, position);
+            }
+        });
     }
 
     @Override
@@ -82,6 +151,9 @@ public class WeekSection extends StatelessSection {
         private TextView eventName;
         private TextView eventType;
         private TextView eventRoom;
+        private ImageButton nextAlternativeButton;
+        private View divider;
+
 
 
 
@@ -94,9 +166,12 @@ public class WeekSection extends StatelessSection {
             eventName = itemView.findViewById(R.id.weekEventName);
             eventType = itemView.findViewById(R.id.weekEventType);
             eventRoom = itemView.findViewById(R.id.weekEventRoom);
+            nextAlternativeButton = itemView.findViewById(R.id.nextAlternativeSubjectButton);
+            divider = itemView.findViewById(R.id.divider4);
 
-
+//
         }
+
     }
 
     class MyHeaderViewHolder extends RecyclerView.ViewHolder {
