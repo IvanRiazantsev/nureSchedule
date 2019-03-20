@@ -64,7 +64,8 @@ public class WeekFragment extends Fragment {
 
         weekRecyclerView = view.findViewById(R.id.weekRecyclerView);
         weekRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        weekRecyclerView.setOnClickListener(onOutsideClickListener);
+//        weekRecyclerView.setOnClickListener(onOutsideClickListener);
+        weekRecyclerView.setItemAnimator(null);
 
         Group selectedGroup = groupDAO.getSelected();
         if (selectedGroup != null) {
@@ -168,6 +169,7 @@ public class WeekFragment extends Fragment {
             if (activity != null) {
                 if (msg.what == 1)
                     WeekFragment.weekRecyclerView.setAdapter(WeekFragment.sectionAdapter);
+
             }
 
         }

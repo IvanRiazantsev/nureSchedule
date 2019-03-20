@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="100dp"
+    android:layout_height="match_parent"
+    android:layout_marginEnd="10dp"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:text="28.02.18"
+        android:textColor="#fff"
+        android:textSize="14sp" />
+
+    <!--107 14 214-->
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/firstEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:minHeight="90dp"
+        android:visibility="invisible"
+        app:cardBackgroundColor="#fff"
+
+        app:cardCornerRadius="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/name1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="СПтК"
+                    android:textSize="15sp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/type1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Лк"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/room1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="318и"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <!--<View-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height=""-->
+            <!--android:layout_weight="0.03"-->
+            <!--android:background="#000"-->
+            <!--/>-->
+
+            <ImageButton
+                android:id="@+id/nextAltButton1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_arrow_back_gray_24dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/secondEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:minHeight="90dp"
+        android:visibility="invisible"
+
+        app:cardBackgroundColor="#fff"
+        app:cardCornerRadius="20dp"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/name2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="СПтК"
+                    android:textSize="15sp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/type2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Лк"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/room2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="318и"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <!--<View-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height=""-->
+            <!--android:layout_weight="0.03"-->
+            <!--android:background="#000"-->
+            <!--/>-->
+
+            <ImageButton
+                android:id="@+id/nextAltButton2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_arrow_back_gray_24dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/thirdEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:minHeight="90dp"
+
+        android:visibility="invisible"
+        app:cardBackgroundColor="#fff"
+        app:cardCornerRadius="20dp"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/name3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="СПтК"
+                    android:textSize="15sp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/type3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Лк"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/room3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="318и"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <!--<View-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height=""-->
+            <!--android:layout_weight="0.03"-->
+            <!--android:background="#000"-->
+            <!--/>-->
+
+            <ImageButton
+                android:id="@+id/nextAltButton3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_arrow_back_gray_24dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/fourthEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_weight="1"
+        android:minHeight="90dp"
+        android:visibility="invisible"
+
+        app:cardBackgroundColor="#fff"
+        app:cardCornerRadius="20dp"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/name4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="СПтК"
+                    android:textSize="15sp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/type4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Лк"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/room4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="318и"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <!--<View-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height=""-->
+            <!--android:layout_weight="0.03"-->
+            <!--android:background="#000"-->
+            <!--/>-->
+
+            <ImageButton
+                android:id="@+id/nextAltButton4"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_arrow_back_gray_24dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/fifthEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:minHeight="90dp"
+        android:visibility="invisible"
+        app:cardBackgroundColor="#fff"
+
+        app:cardCornerRadius="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/name5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="СПтК"
+                    android:textSize="15sp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/type5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Лк"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/room5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="318и"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <!--<View-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height=""-->
+            <!--android:layout_weight="0.03"-->
+            <!--android:background="#000"-->
+            <!--/>-->
+
+            <ImageButton
+                android:id="@+id/nextAltButton5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_arrow_back_gray_24dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/sixthEvent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_weight="1"
+        android:minHeight="90dp"
+        android:visibility="invisible"
+
+        app:cardBackgroundColor="#fff"
+        app:cardCornerRadius="20dp"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/name6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="СПтК"
+                    android:textSize="15sp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/type6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Лк"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/room6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="318и"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <!--<View-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height=""-->
+            <!--android:layout_weight="0.03"-->
+            <!--android:background="#000"-->
+            <!--/>-->
+
+            <ImageButton
+                android:id="@+id/nextAltButton6"
+                android:layout_width="0dp"
+
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/ic_arrow_back_gray_24dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</LinearLayout>

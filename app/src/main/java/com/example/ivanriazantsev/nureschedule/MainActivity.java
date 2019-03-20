@@ -3,6 +3,7 @@ package com.example.ivanriazantsev.nureschedule;
 import adapters.AddGroupRecyclerViewAdapter;
 import adapters.SavedGroupsRecyclerViewAdapter;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -26,6 +27,7 @@ import retrofit2.Response;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton groupFAB;
     FloatingActionButton addGroupFAB;
     public static FloatingActionButton refreshGroupsFAB;
+    public static FloatingActionButton deleteGroupsFAB;
     public static BottomSheetBehavior bottomSheetBehaviorSavedGroups;
     static BottomSheetBehavior bottomSheetBehaviorAddGroups;
 
@@ -93,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton doneFAB;
 
     public static TextView selectedScheduleName;
-
-
 
 
     @Override
@@ -178,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
                 && bottomSheetBehaviorAddGroups.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             finish();
         }
+        selectedScheduleName.setVisibility(View.VISIBLE);
 
     }
 
@@ -189,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-//        database.clearAllTables();
+        database.clearAllTables();
 
         bottomSheetBehaviorSavedGroups = BottomSheetBehavior.from(findViewById(R.id.groupsBottomSheet));
         bottomSheetBehaviorAddGroups = BottomSheetBehavior.from(findViewById(R.id.addGroupBottomSheet));
@@ -243,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
             public void onStateChanged(@NonNull View view, int i) {
                 if (i == BottomSheetBehavior.STATE_COLLAPSED) {
                     refreshGroupsFAB.setVisibility(View.GONE);
+                    deleteGroupsFAB.setVisibility(View.GONE);
                     addGroupFAB.setVisibility(View.GONE);
                 }
             }
@@ -251,11 +254,14 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("RestrictedApi")
             @Override
             public void onSlide(@NonNull View view, float v) {
-                if (savedGroupsPlaceholder.getVisibility() == View.GONE)
+                if (savedGroupsPlaceholder.getVisibility() == View.GONE) {
                     refreshGroupsFAB.setVisibility(View.VISIBLE);
+                    deleteGroupsFAB.setVisibility(View.VISIBLE);
+                }
                 addGroupFAB.setVisibility(View.VISIBLE);
 
                 refreshGroupsFAB.animate().scaleX(v).scaleY(v).setDuration(0).start();
+                deleteGroupsFAB.animate().scaleX(v).scaleY(v).setDuration(0).start();
                 addGroupFAB.animate().scaleX(v).scaleY(v).setDuration(0).start();
             }
         });
@@ -277,6 +283,7 @@ public class MainActivity extends AppCompatActivity {
         if ((!savedGroupsList.isEmpty() || !savedTeachersList.isEmpty())
                 && bottomSheetBehaviorSavedGroups.getState() != BottomSheetBehavior.STATE_COLLAPSED) {
             refreshGroupsFAB.setVisibility(View.VISIBLE);
+            deleteGroupsFAB.setVisibility(View.VISIBLE);
         }
 
 
@@ -364,12 +371,42 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        deleteGroupsFAB = findViewById(R.id.deleteGroupsButton);
+        deleteGroupsFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder deletionDialog = new AlertDialog.Builder(MainActivity.this);
+                deletionDialog.setCancelable(true);
+                deletionDialog.setTitle("Удалить все расписания");
+                deletionDialog.setMessage("Вы уверены, что хотите удалить все сохраненные расписания?");
+                deletionDialog.setPositiveButton("Удалить", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        database.clearAllTables();
+                        selectedScheduleName.setText("");
+                        WeekFragment.sectionAdapter.removeAllSections();
+                        WeekFragment.sectionAdapter.notifyDataSetChanged();
+                        savedGroupsAdapter.clearList();
+                        savedGroupsPlaceholder.setVisibility(View.VISIBLE);
+                        WeekFragment.weekPlaceholder.setVisibility(View.VISIBLE);
+                        refreshGroupsFAB.setVisibility(View.GONE);
+                        deleteGroupsFAB.setVisibility(View.GONE);
+                    }
+                });
+                deletionDialog.setNegativeButton("Отменить", null);
+                deletionDialog.show();
+
+
+
+
+            }
+        });
+
         selectedScheduleName = findViewById(R.id.selectedScheduleName);
         if (groupDAO.getSelected() != null) {
             selectedScheduleName.setText(groupDAO.getSelected().getName());
             selectedScheduleName.setVisibility(View.VISIBLE);
         }
-
 
 
     }

@@ -64,7 +64,11 @@ public class App extends Application {
     }
 
     public static Date getDateFromUnix(Long timestamp) {
-        return new java.util.Date(timestamp * 1000L);
+        Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
+        calendar.setTime(new Date(timestamp * 1000L));
+
+        return calendar.getTime();
     }
 
     public static String getHoursAndMinutesTimeFromUnix(Long unixTime) {
@@ -84,6 +88,11 @@ public class App extends Application {
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
         return simpleDateFormat.format(getDateFromUnix(unixTime / 1000L));
     }
+    public static String getDateForSemester(Long unixTime) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("E, dd.MM",locale);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
+        return simpleDateFormat.format(unixTime * 1000);
+    }
 
     public static Date getStartOfDay(Date date) {
         Calendar calendar = Calendar.getInstance(locale);
@@ -93,6 +102,14 @@ public class App extends Application {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    public static Date getStartOfNextDay(Date date) {
+        Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 1);
         return calendar.getTime();
     }
 
@@ -119,35 +136,7 @@ public class App extends Application {
 
 
     private void initializeEventsColors() {
-//        //Lectures
-//        eventsColors.put(0, Color.argb(255,235,201,87));
-//        eventsColors.put(1, Color.argb(255,235,201,87));
-//        eventsColors.put(2, Color.argb(255,235,201,87));
-//
-//        //practical
-//        eventsColors.put(10, Color.argb(255,182,221,119));
-//        eventsColors.put(12, Color.argb(255,182,221,119));
-//
-//        //laboratory
-//        eventsColors.put(20, Color.argb(255,153,110,187));
-//        eventsColors.put(21, Color.argb(255,153,110,187));
-//        eventsColors.put(22, Color.argb(255,153,110,187));
-//        eventsColors.put(23, Color.argb(255,153,110,187));
-//        eventsColors.put(24, Color.argb(255,153,110,187));
-//
-//        //consultation
-//        eventsColors.put(30, Color.argb(255,138,190,214));
-//
-//        //tests
-//        eventsColors.put(40, Color.argb(255,113,214,198));
-//        eventsColors.put(41, Color.argb(255,113,214,198));
-//
-//        //exams
-//        eventsColors.put(50, Color.argb(255,179,29,29));
-//        eventsColors.put(51, Color.argb(255,179,29,29));
-//        eventsColors.put(52, Color.argb(255,179,29,29));
-//        eventsColors.put(53, Color.argb(255,179,29,29));
-//        eventsColors.put(54, Color.argb(255,179,29,29));
+
 
         eventsColors.put("lecture", Color.argb(255, 235, 201, 87));
         eventsColors.put("practice", Color.argb(255, 182, 221, 119));

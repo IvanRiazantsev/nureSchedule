@@ -127,7 +127,10 @@ public class WeekSection extends StatelessSection {
 
                 itemHolder.cardView.setCardBackgroundColor(App.eventsColors.get(type.getType()));
 
+//                WeekFragment.sectionAdapter.notifyItemChangedInSection(WeekSection.this, position);
+//                WeekFragment.sectionAdapter.notifyDataSetChanged();
                 WeekFragment.sectionAdapter.notifyItemChangedInSection(WeekSection.this, position);
+
             }
         });
     }

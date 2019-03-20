@@ -101,6 +101,7 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
                     MainActivity.savedGroupsAdapter.notifyDataSetChanged();
                     MainActivity.savedGroupsPlaceholder.setVisibility(View.GONE);
                     MainActivity.refreshGroupsFAB.setVisibility(View.VISIBLE);
+                    MainActivity.deleteGroupsFAB.setVisibility(View.VISIBLE);
 
                     Toast.makeText(v.getContext(), "Добавлено", Toast.LENGTH_SHORT).show();
                 } catch (SQLiteConstraintException e) {

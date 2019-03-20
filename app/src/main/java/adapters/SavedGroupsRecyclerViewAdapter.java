@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.example.ivanriazantsev.nureschedule.App;
 import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
+import com.example.ivanriazantsev.nureschedule.SemesterFragment;
 import com.example.ivanriazantsev.nureschedule.WeekFragment;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
@@ -128,6 +129,15 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 deleteDialog.setPositiveButton("Удалить", (dialog, which) -> {
                     int position = getAdapterPosition();
 
+                    //TODO: teacher
+                    if (groupDAO.getSelected() != null && groupDAO.getSelected().getName()
+                            .equals(mList.get(position) instanceof Group
+                                    ? ((Group) mList.get(position)).getName() : ((Teacher) mList.get(position)).getShortName())) {
+                        MainActivity.selectedScheduleName.setText("");
+                        WeekFragment.sectionAdapter.removeAllSections();
+                        WeekFragment.sectionAdapter.notifyDataSetChanged();
+                        WeekFragment.weekPlaceholder.setVisibility(View.VISIBLE);
+                    }
                     if (mList.get(position) instanceof Group) {
                         groupDAO.deleteGroup((Group) mList.get(position));
                     } else if (mList.get(position) instanceof Teacher) {
@@ -140,10 +150,13 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     if (mList.isEmpty()) {
                         MainActivity.savedGroupsPlaceholder.setVisibility(View.VISIBLE);
                         MainActivity.refreshGroupsFAB.setVisibility(View.GONE);
+                        MainActivity.deleteGroupsFAB.setVisibility(View.GONE);
                     } else {
                         MainActivity.savedGroupsPlaceholder.setVisibility(View.GONE);
                         MainActivity.refreshGroupsFAB.setVisibility(View.VISIBLE);
+                        MainActivity.deleteGroupsFAB.setVisibility(View.VISIBLE);
                     }
+
 
                     eventDAO.deleteAllForGroup(name.getText().toString());
                     updateDate.setText("Не обновлялось");
@@ -212,17 +225,6 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     Toast.makeText(itemView.getContext(), "Обновите расписание", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-
-//                @SuppressLint("HandlerLeak") Handler handler = new Handler() {
-//                    @Override
-//                    public void handleMessage(Message msg) {
-//                        super.handleMessage(msg);
-//                        if (msg.what == 1)
-//                            WeekFragment.weekRecyclerView.setAdapter(WeekFragment.sectionAdapter);
-//                    }
-//                };
-//                new Thread(() -> {
                 Date currentDate = new Date();
                 Date currentDay = App.getStartOfDay(currentDate);
                 Date dayInAWeek = App.getStartOfDayInAWeek(currentDate);
@@ -292,11 +294,6 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[5].getTime()), eventsByDaysList.get(5)));
                 WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[6].getTime()), eventsByDaysList.get(6)));
 
-//                    handler.sendEmptyMessage(1);
-
-
-//                }).start();
-
 
                 WeekFragment.weekRecyclerView.setAdapter(WeekFragment.sectionAdapter);
                 MainActivity.selectedScheduleName.setText(name.getText());
@@ -306,6 +303,21 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 WeekFragment.weekPlaceholder.setVisibility(View.GONE);
 
                 groupDAO.updateIsSelected(true, name.getText().toString());
+
+                List<List<Event>> events = new ArrayList<>();
+
+                Date begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(groupDAO.getSelected().getName()))));
+
+                Date end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName())))));
+
+
+                for (long i = begin.getTime(); i < end.getTime(); i += 86400000) {
+                    events.add(eventDAO.getEventsBetweenTwoDatesForGroup(groupDAO.getSelected().getName(), (int) (i / 1000), (int) ((i + 86400000) / 1000)));
+                }
+
+                SemesterFragment.semesterRecyclerAdapter.setList(events);
+                SemesterFragment.semesterRecyclerView.setAdapter(SemesterFragment.semesterRecyclerAdapter);
+                SemesterFragment.semesterPlaceholder.setVisibility(View.GONE);
 
             });
 
