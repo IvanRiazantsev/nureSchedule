@@ -304,8 +304,6 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 WeekFragment.weekPlaceholder.setVisibility(View.GONE);
 
 
-
-
                 if (groupDAO.getSelected() != null)
                     groupDAO.updateIsSelected(false, groupDAO.getSelected().getName());
 
@@ -320,8 +318,19 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
 
                 ArrayMap<Event, List<Event>> simultaneousEvents = new ArrayMap<>();
 
+
                 for (long i = begin.getTime(); i < end.getTime(); i += 86400000) {
                     List<Event> eventsForDay = eventDAO.getEventsBetweenTwoDatesForGroup(groupDAO.getSelected().getName(), (int) (i / 1000), (int) ((i + 86400000) / 1000));
+
+                    for (int z = 0; z < eventsForDay.size(); z++) {
+                        List<Integer> list = eventsForDay.get(z).getGroups();
+                        if (!list.contains(groupDAO.getByName(name.getText().toString()).getId())) {
+                            eventsForDay.remove(z);
+                            z--;
+                        }
+                    }
+
+
                     removeDuplicates(eventsForDay);
                     for (int j = 0; j < eventsForDay.size(); j++) {
                         Integer startTime = eventsForDay.get(j).getStartTime();
@@ -339,8 +348,8 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     events.add(eventsForDay);
                 }
 
-                SemesterFragment.semesterRecyclerAdapter.setList(events);
-                SemesterFragment.semesterRecyclerAdapter.setSimultaneousEvents(simultaneousEvents);
+                SemesterFragment.semesterRecyclerAdapter.setSimultaneousEvents(events, simultaneousEvents);
+                SemesterFragment.semesterRecyclerView.setItemAnimator(null);
                 SemesterFragment.semesterRecyclerView.setAdapter(SemesterFragment.semesterRecyclerAdapter);
                 SemesterFragment.semesterPlaceholder.setVisibility(View.GONE);
 

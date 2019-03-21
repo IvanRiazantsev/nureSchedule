@@ -17,8 +17,10 @@ import com.example.ivanriazantsev.nureschedule.R;
 import com.example.ivanriazantsev.nureschedule.SemesterFragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -32,22 +34,35 @@ import events.Type;
 public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecyclerAdapter.SemesterViewHolder> {
 
 
-    private List<List<Event>> eventsLists = new ArrayList<>();
+    private List<List<Event>> eventsLists;
     private AppDatabase database = App.getDatabase();
     private SubjectDAO subjectDAO = database.subjectDAO();
     private TypeDAO typeDAO = database.typeDAO();
-    private ArrayMap<Event, List<Event>> simultaneousEvents;
-    private List<List<Event>> eventsListCopy = new ArrayList<>();
+    private  List<List<Event>> eventsListCopy = new ArrayList<>();
+
+    ArrayMap<Event, List<Event>> simultaneousEvents;
 
 
-    public void setSimultaneousEvents(ArrayMap<Event, List<Event>> simultaneousEvents) {
+    @SuppressLint("NewApi")
+    public void setSimultaneousEvents(List<List<Event>> eventsLists, ArrayMap<Event, List<Event>> simultaneousEvents) {
         this.simultaneousEvents = simultaneousEvents;
+
+
+        this.eventsLists = eventsLists;
+
+        for (int i = 0; i < eventsLists.size(); i++) {
+            List<Event> events = new ArrayList<>();
+            for (Event event : eventsLists.get(i)) {
+                events.add(event);
+            }
+            eventsListCopy.add(events);
+        }
     }
 
     public void setList(List<List<Event>> list) {
-        eventsLists.addAll(list);
-        eventsListCopy.addAll(list);
-        notifyDataSetChanged();
+//        eventsLists.addAll(list);
+//        eventsListCopy.addAll(list);
+//        notifyDataSetChanged();
     }
 
     public void clearList() {
@@ -75,17 +90,13 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
         if (eventsForDay.size() != 0 && App.getStartOfDay(new Date(eventsForDay.get(0).getStartTime() * 1000)).getTime() == App.getStartOfDay(new Date()).getTime())
             holder.date.setTextColor(Color.argb(255, 107, 14, 214));
         //TODO: empty days dates
+        List<Event> eventsForDayCopy = eventsListCopy.get(position);
+
+
         for (int i = 0; i < eventsForDay.size(); i++) {
             Event event = eventsForDay.get(i);
-            if (!simultaneousEvents.containsKey(event)) {
-                event = eventsListCopy.get(position).get(i);
-            }
 
-//            try {
-            int size = simultaneousEvents.get(event).size();
-//            } catch (NullPointerException e) {
-//                e.printStackTrace();
-//            }
+            int size;
 
 
             switch (eventsForDay.get(i).getNumberPair()) {
@@ -96,17 +107,18 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                     holder.type1.setText(typeDAO.getById(typeDAO.getById(event.getType()).getId()).getShortName());
                     holder.room1.setText(event.getAuditory());
                     holder.card1.setVisibility(View.VISIBLE);
+                    if (!simultaneousEvents.containsKey(event)) {
+                        event = eventsForDayCopy.get(i);
+                    }
+                    size = simultaneousEvents.get(event).size();
                     if (size != 0) {
                         holder.nextAltButton1.setVisibility(View.VISIBLE);
                         Event finalEvent = event;
                         int finalI = i;
                         holder.nextAltButton1.setOnClickListener(v -> {
-                            System.out.println(3333333);
-
                             int current = -1;
                             for (int j = 0; j < size; j++) {
                                 if (holder.room1.getText().toString().equals(simultaneousEvents.get(finalEvent).get(j).getAuditory())) {
-
                                     current = j;
                                     break;
                                 }
@@ -116,11 +128,6 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                             } else {
                                 eventsLists.get(position).set(finalI, finalEvent);
                             }
-
-                            holder.card1.setCardBackgroundColor(App.eventsColors.get(typeDAO.getById(finalEvent.getType()).getType()));
-                            holder.name1.setText(subjectDAO.getById(finalEvent.getSubjectId()).getBrief());
-                            holder.type1.setText(typeDAO.getById(finalEvent.getType()).getShortName());
-                            holder.room1.setText(finalEvent.getAuditory());
 
                             notifyItemChanged(position);
                         });
@@ -133,6 +140,10 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                     holder.type2.setText(typeDAO.getById(typeDAO.getById(event.getType()).getId()).getShortName());
                     holder.room2.setText(event.getAuditory());
                     holder.card2.setVisibility(View.VISIBLE);
+                    if (!simultaneousEvents.containsKey(event)) {
+                        event = eventsForDayCopy.get(i);
+                    }
+                    size = simultaneousEvents.get(event).size();
                     if (size != 0) {
                         holder.nextAltButton2.setVisibility(View.VISIBLE);
                         Event finalEvent = event;
@@ -145,17 +156,11 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                                     break;
                                 }
                             }
-                            System.out.println(current);
                             if (current != size - 1) {
                                 eventsLists.get(position).set(finalI, simultaneousEvents.get(finalEvent).get(current + 1));
                             } else {
                                 eventsLists.get(position).set(finalI, finalEvent);
                             }
-
-                            holder.card2.setCardBackgroundColor(App.eventsColors.get(typeDAO.getById(finalEvent.getType()).getType()));
-                            holder.name2.setText(subjectDAO.getById(finalEvent.getSubjectId()).getBrief());
-                            holder.type2.setText(typeDAO.getById(finalEvent.getType()).getShortName());
-                            holder.room2.setText(finalEvent.getAuditory());
 
                             notifyItemChanged(position);
                         });
@@ -168,6 +173,10 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                     holder.type3.setText(typeDAO.getById(typeDAO.getById(event.getType()).getId()).getShortName());
                     holder.room3.setText(event.getAuditory());
                     holder.card3.setVisibility(View.VISIBLE);
+                    if (!simultaneousEvents.containsKey(event)) {
+                        event = eventsForDayCopy.get(i);
+                    }
+                    size = simultaneousEvents.get(event).size();
                     if (size != 0) {
                         holder.nextAltButton3.setVisibility(View.VISIBLE);
                         Event finalEvent = event;
@@ -180,16 +189,12 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                                     break;
                                 }
                             }
+
                             if (current != size - 1) {
                                 eventsLists.get(position).set(finalI, simultaneousEvents.get(finalEvent).get(current + 1));
                             } else {
                                 eventsLists.get(position).set(finalI, finalEvent);
                             }
-
-                            holder.card3.setCardBackgroundColor(App.eventsColors.get(typeDAO.getById(finalEvent.getType()).getType()));
-                            holder.name3.setText(subjectDAO.getById(finalEvent.getSubjectId()).getBrief());
-                            holder.type3.setText(typeDAO.getById(finalEvent.getType()).getShortName());
-                            holder.room3.setText(finalEvent.getAuditory());
 
                             notifyItemChanged(position);
                         });
@@ -202,6 +207,10 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                     holder.type4.setText(typeDAO.getById(typeDAO.getById(event.getType()).getId()).getShortName());
                     holder.room4.setText(event.getAuditory());
                     holder.card4.setVisibility(View.VISIBLE);
+                    if (!simultaneousEvents.containsKey(event)) {
+                        event = eventsForDayCopy.get(i);
+                    }
+                    size = simultaneousEvents.get(event).size();
                     if (size != 0) {
                         holder.nextAltButton4.setVisibility(View.VISIBLE);
                         Event finalEvent = event;
@@ -220,11 +229,6 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                                 eventsLists.get(position).set(finalI, finalEvent);
                             }
 
-                            holder.card4.setCardBackgroundColor(App.eventsColors.get(typeDAO.getById(finalEvent.getType()).getType()));
-                            holder.name4.setText(subjectDAO.getById(finalEvent.getSubjectId()).getBrief());
-                            holder.type4.setText(typeDAO.getById(finalEvent.getType()).getShortName());
-                            holder.room4.setText(finalEvent.getAuditory());
-
                             notifyItemChanged(position);
                         });
                     }
@@ -236,6 +240,10 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                     holder.type5.setText(typeDAO.getById(typeDAO.getById(event.getType()).getId()).getShortName());
                     holder.room5.setText(event.getAuditory());
                     holder.card5.setVisibility(View.VISIBLE);
+                    if (!simultaneousEvents.containsKey(event)) {
+                        event = eventsForDayCopy.get(i);
+                    }
+                    size = simultaneousEvents.get(event).size();
                     if (size != 0) {
                         holder.nextAltButton5.setVisibility(View.VISIBLE);
                         Event finalEvent = event;
@@ -243,7 +251,7 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                         holder.nextAltButton5.setOnClickListener(v -> {
                             int current = -1;
                             for (int j = 0; j < size; j++) {
-                                if (holder.room1.getText().toString().equals(simultaneousEvents.get(finalEvent).get(j).getAuditory())) {
+                                if (holder.room5.getText().toString().equals(simultaneousEvents.get(finalEvent).get(j).getAuditory())) {
                                     current = j;
                                     break;
                                 }
@@ -253,11 +261,6 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                             } else {
                                 eventsLists.get(position).set(finalI, finalEvent);
                             }
-
-                            holder.card5.setCardBackgroundColor(App.eventsColors.get(typeDAO.getById(finalEvent.getType()).getType()));
-                            holder.name5.setText(subjectDAO.getById(finalEvent.getSubjectId()).getBrief());
-                            holder.type5.setText(typeDAO.getById(finalEvent.getType()).getShortName());
-                            holder.room5.setText(finalEvent.getAuditory());
 
                             notifyItemChanged(position);
                         });
@@ -270,6 +273,10 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                     holder.type6.setText(typeDAO.getById(typeDAO.getById(event.getType()).getId()).getShortName());
                     holder.room6.setText(event.getAuditory());
                     holder.card6.setVisibility(View.VISIBLE);
+                    if (!simultaneousEvents.containsKey(event)) {
+                        event = eventsForDayCopy.get(i);
+                    }
+                    size = simultaneousEvents.get(event).size();
                     if (size != 0) {
                         holder.nextAltButton6.setVisibility(View.VISIBLE);
                         Event finalEvent = event;
@@ -277,21 +284,17 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                         holder.nextAltButton6.setOnClickListener(v -> {
                             int current = -1;
                             for (int j = 0; j < size; j++) {
-                                if (holder.room1.getText().toString().equals(simultaneousEvents.get(finalEvent).get(j).getAuditory())) {
+                                if (holder.room6.getText().toString().equals(simultaneousEvents.get(finalEvent).get(j).getAuditory())) {
                                     current = j;
                                     break;
                                 }
                             }
+
                             if (current != size - 1) {
                                 eventsLists.get(position).set(finalI, simultaneousEvents.get(finalEvent).get(current + 1));
                             } else {
                                 eventsLists.get(position).set(finalI, finalEvent);
                             }
-
-                            holder.card6.setCardBackgroundColor(App.eventsColors.get(typeDAO.getById(finalEvent.getType()).getType()));
-                            holder.name6.setText(subjectDAO.getById(finalEvent.getSubjectId()).getBrief());
-                            holder.type6.setText(typeDAO.getById(finalEvent.getType()).getShortName());
-                            holder.room6.setText(finalEvent.getAuditory());
 
                             notifyItemChanged(position);
                         });
@@ -299,11 +302,6 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                     break;
             }
         }
-//        }
-
-
-//        notifyDataSetChanged();
-
     }
 
 

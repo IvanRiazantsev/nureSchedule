@@ -63,6 +63,8 @@ public class WeekSection extends StatelessSection {
 
 
 
+
+
     }
 
 
@@ -97,6 +99,7 @@ public class WeekSection extends StatelessSection {
 
 
 
+
         if (!simultaneousEvents.containsKey(event)) {
             event = eventListCopy.get(position);
         }
@@ -124,20 +127,11 @@ public class WeekSection extends StatelessSection {
                 }
                 if (current != size - 1) {
                     eventList.set(position, simultaneousEvents.get(finalEvent).get(current + 1));
+
                 } else {
                     eventList.set(position, finalEvent);
                 }
-                Type type = typeDAO.getById(finalEvent.getType());
-                itemHolder.timeStart.setText(App.getHoursAndMinutesTimeFromUnix((long) finalEvent.getStartTime()));
-                itemHolder.timeEnd.setText(App.getHoursAndMinutesTimeFromUnix((long) finalEvent.getEndTime()));
-                itemHolder.eventName.setText(subjectDAO.getById(finalEvent.getSubjectId()).getTitle());
-                itemHolder.eventRoom.setText(finalEvent.getAuditory());
-                itemHolder.eventType.setText(type.getShortName());
 
-                itemHolder.cardView.setCardBackgroundColor(App.eventsColors.get(type.getType()));
-
-//                WeekFragment.sectionAdapter.notifyItemChangedInSection(WeekSection.this, position);
-//                WeekFragment.sectionAdapter.notifyDataSetChanged();
                 WeekFragment.sectionAdapter.notifyItemChangedInSection(WeekSection.this, position);
 
             }
