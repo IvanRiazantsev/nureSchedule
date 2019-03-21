@@ -48,7 +48,7 @@
                     android:id="@+id/name1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="СПтК"
+                    android:text=""
                     android:textSize="15sp"
 
                     />
@@ -57,14 +57,14 @@
                     android:id="@+id/type1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Лк"
+                    android:text=""
                     android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/room1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="318и"
+                    android:text=""
                     android:textSize="15sp" />
 
             </LinearLayout>
@@ -83,7 +83,7 @@
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:src="@drawable/ic_arrow_back_gray_24dp"
-                android:visibility="invisible" />
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -121,7 +121,7 @@
                     android:id="@+id/name2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="СПтК"
+                    android:text=""
                     android:textSize="15sp"
 
                     />
@@ -130,14 +130,14 @@
                     android:id="@+id/type2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Лк"
+                    android:text=""
                     android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/room2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="318и"
+                    android:text=""
                     android:textSize="15sp" />
 
             </LinearLayout>
@@ -157,7 +157,7 @@
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:src="@drawable/ic_arrow_back_gray_24dp"
-                android:visibility="invisible" />
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -195,7 +195,7 @@
                     android:id="@+id/name3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="СПтК"
+                    android:text=""
                     android:textSize="15sp"
 
                     />
@@ -204,14 +204,14 @@
                     android:id="@+id/type3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Лк"
+                    android:text=""
                     android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/room3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="318и"
+                    android:text=""
                     android:textSize="15sp" />
 
             </LinearLayout>
@@ -231,7 +231,7 @@
 
                 android:background="?attr/selectableItemBackground"
                 android:src="@drawable/ic_arrow_back_gray_24dp"
-                android:visibility="invisible" />
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -268,7 +268,7 @@
                     android:id="@+id/name4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="СПтК"
+                    android:text=""
                     android:textSize="15sp"
 
                     />
@@ -277,14 +277,14 @@
                     android:id="@+id/type4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Лк"
+                    android:text=""
                     android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/room4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="318и"
+                    android:text=""
                     android:textSize="15sp" />
 
             </LinearLayout>
@@ -304,7 +304,7 @@
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:src="@drawable/ic_arrow_back_gray_24dp"
-                android:visibility="invisible" />
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -339,7 +339,7 @@
                     android:id="@+id/name5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="СПтК"
+                    android:text=""
                     android:textSize="15sp"
 
                     />
@@ -348,14 +348,14 @@
                     android:id="@+id/type5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Лк"
+                    android:text=""
                     android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/room5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="318и"
+                    android:text=""
                     android:textSize="15sp" />
 
             </LinearLayout>
@@ -375,7 +375,7 @@
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:src="@drawable/ic_arrow_back_gray_24dp"
-                android:visibility="invisible" />
+                android:visibility="gone" />
 
         </LinearLayout>
 
@@ -389,7 +389,6 @@
         android:layout_weight="1"
         android:minHeight="90dp"
         android:visibility="invisible"
-
         app:cardBackgroundColor="#fff"
         app:cardCornerRadius="20dp"
 
@@ -412,7 +411,7 @@
                     android:id="@+id/name6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="СПтК"
+                    android:text=""
                     android:textSize="15sp"
 
                     />
@@ -421,21 +420,21 @@
                     android:id="@+id/type6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Лк"
+                    android:text=""
                     android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/room6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="318и"
+                    android:text=""
                     android:textSize="15sp" />
 
             </LinearLayout>
 
             <!--<View-->
             <!--android:layout_width="0dp"-->
-            <!--android:layout_height=""-->
+            <!--android:layout_height="wrap_content"-->
             <!--android:layout_weight="0.03"-->
             <!--android:background="#000"-->
             <!--/>-->
@@ -445,10 +444,11 @@
                 android:layout_width="0dp"
 
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="1.3"
                 android:background="?attr/selectableItemBackground"
                 android:src="@drawable/ic_arrow_back_gray_24dp"
-                android:visibility="invisible" />
+                android:visibility="gone"
+                 />
 
         </LinearLayout>
 

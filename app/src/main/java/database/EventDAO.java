@@ -3,7 +3,7 @@ package database;
 import java.util.Date;
 import java.util.List;
 
-import androidx.paging.DataSource;
+
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -33,8 +33,6 @@ public interface EventDAO {
     @Query("SELECT * FROM event WHERE startTime >= :time AND forGroup = :group")
     List<Event> getEventsForGroupFromDate(int time, String group);
 
-    @Query("SELECT * FROM event WHERE forGroup = :group")
-    DataSource.Factory<Integer,Event> getAllForGroupDS(String group);
 
     @Query("SELECT min(startTime) FROM event WHERE forGroup = :group")
     Integer getMinTimeForGroup(String group);

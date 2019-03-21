@@ -19,6 +19,17 @@
         android:visibility="gone" />
 
 
+    <!--<ProgressBar-->
+        <!--android:id="@+id/pb"-->
+        <!--android:layout_width="2dip"-->
+        <!--android:layout_height="match_parent"-->
+        <!--style="@style/Widget.ProgressBar.Vertical"-->
+        <!--app:layout_constraintStart_toEndOf="@id/timeline"-->
+        <!--app:layout_constraintBottom_toBottomOf="@id/timeline"-->
+        <!--app:layout_constraintTop_toTopOf="@id/timeline"-->
+        <!--/>-->
+
+
     <LinearLayout
         android:id="@+id/timeline"
         android:layout_width="60dp"

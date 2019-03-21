@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
+import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -302,7 +303,14 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
 
                 WeekFragment.weekPlaceholder.setVisibility(View.GONE);
 
+
+
+
+                if (groupDAO.getSelected() != null)
+                    groupDAO.updateIsSelected(false, groupDAO.getSelected().getName());
+
                 groupDAO.updateIsSelected(true, name.getText().toString());
+
 
                 List<List<Event>> events = new ArrayList<>();
 
@@ -310,12 +318,29 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
 
                 Date end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName())))));
 
+                ArrayMap<Event, List<Event>> simultaneousEvents = new ArrayMap<>();
 
                 for (long i = begin.getTime(); i < end.getTime(); i += 86400000) {
-                    events.add(eventDAO.getEventsBetweenTwoDatesForGroup(groupDAO.getSelected().getName(), (int) (i / 1000), (int) ((i + 86400000) / 1000)));
+                    List<Event> eventsForDay = eventDAO.getEventsBetweenTwoDatesForGroup(groupDAO.getSelected().getName(), (int) (i / 1000), (int) ((i + 86400000) / 1000));
+                    removeDuplicates(eventsForDay);
+                    for (int j = 0; j < eventsForDay.size(); j++) {
+                        Integer startTime = eventsForDay.get(j).getStartTime();
+                        Event current = eventsForDay.get(j);
+                        List<Event> events1 = new ArrayList<>();
+                        for (int q = j + 1; q < eventsForDay.size(); q++) {
+                            if (startTime.equals(eventsForDay.get(q).getStartTime())) {
+                                events1.add(eventsForDay.get(q));
+                                eventsForDay.remove(q);
+                                q--;
+                            }
+                        }
+                        simultaneousEvents.put(current, events1);
+                    }
+                    events.add(eventsForDay);
                 }
 
                 SemesterFragment.semesterRecyclerAdapter.setList(events);
+                SemesterFragment.semesterRecyclerAdapter.setSimultaneousEvents(simultaneousEvents);
                 SemesterFragment.semesterRecyclerView.setAdapter(SemesterFragment.semesterRecyclerAdapter);
                 SemesterFragment.semesterPlaceholder.setVisibility(View.GONE);
 

@@ -1,8 +1,10 @@
 package adapters;
 
+import android.os.CountDownTimer;
 import android.util.ArrayMap;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.ivanriazantsev.nureschedule.App;
@@ -34,6 +36,8 @@ public class WeekSection extends StatelessSection {
     ArrayMap<Event, List<Event>> simultaneousEvents = new ArrayMap<>();
 
 
+
+
     public WeekSection(String date, List<Event> eventList) {
         super(SectionParameters.builder()
                 .itemResourceId(R.layout.week_recycler_item)
@@ -56,6 +60,9 @@ public class WeekSection extends StatelessSection {
             simultaneousEvents.put(current, events);
         }
         eventListCopy.addAll(eventList);
+
+
+
     }
 
 
@@ -86,6 +93,8 @@ public class WeekSection extends StatelessSection {
         itemHolder.eventType.setText(type.getShortName());
 
         itemHolder.cardView.setCardBackgroundColor(App.eventsColors.get(type.getType()));
+
+
 
 
         if (!simultaneousEvents.containsKey(event)) {
@@ -160,6 +169,7 @@ public class WeekSection extends StatelessSection {
 
 
 
+
         public MyItemViewHolder(View itemView) {
             super(itemView);
 
@@ -171,6 +181,8 @@ public class WeekSection extends StatelessSection {
             eventRoom = itemView.findViewById(R.id.weekEventRoom);
             nextAlternativeButton = itemView.findViewById(R.id.nextAlternativeSubjectButton);
             divider = itemView.findViewById(R.id.divider4);
+
+
 
 //
         }
