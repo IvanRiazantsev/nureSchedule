@@ -13,4 +13,10 @@
     <color name="colorBottomMenuItemUnchecked">#999999</color>
     <color name="colorBackground">#1A1B1F</color>
     <color name="splash_screen_background">#363636</color>
+
+    <color name="pagesColor">#363636</color>
+
+
+
+
 </resources>

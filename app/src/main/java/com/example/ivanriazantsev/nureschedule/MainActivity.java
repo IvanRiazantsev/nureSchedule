@@ -42,6 +42,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applandeo.materialcalendarview.DatePicker;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -58,7 +59,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
 
 
-    private Toolbar toolbar;
+    public static Toolbar toolbar;
 
     final Fragment weekFragment = new WeekFragment();
     final Fragment semesterFragment = new SemesterFragment();
@@ -97,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static TextView selectedScheduleName;
 
+    DatePicker datePicker;
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -112,9 +115,12 @@ public class MainActivity extends AppCompatActivity {
         if (!isSettingsOnScreen && active == weekFragment) {
             settings.setVisible(true);
             calendar.setVisible(false);
-        } else if (!isSettingsOnScreen && active == semesterFragment) {
+        } else if (!isSettingsOnScreen && active == semesterFragment && groupDAO.getSelected() != null) {
             settings.setVisible(true);
             calendar.setVisible(true);
+        } else if (!isSettingsOnScreen && active == semesterFragment) {
+            settings.setVisible(true);
+            calendar.setVisible(false);
         } else {
             settings.setVisible(false);
             calendar.setVisible(false);
@@ -127,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
         bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
         switch (item.getItemId()) {
             case R.id.calendarToolbarItem:
-                Toast.makeText(this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+                datePicker = SemesterFragment.builder.build();
+                datePicker.show();
                 return true;
             case R.id.settingsToolbarItem:
                 isSettingsOnScreen = true;
@@ -496,7 +503,8 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.semesterBottomNavigationItem:
                     fm.beginTransaction().hide(active).show(semesterFragment).commit();
                     active = semesterFragment;
-                    toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
+                    if (groupDAO.getSelected() != null)
+                        toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
                     return true;
             }
             return false;

@@ -7,6 +7,7 @@ import java.util.List;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 import api.Group;
@@ -40,10 +41,10 @@ public interface EventDAO {
     @Query("SELECT max(startTime) FROM event WHERE forGroup = :group")
     Integer getMaxTimeForGroup(String group);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertEvent(Event event);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertEventsList(List<Event> eventList);
 
     @Update

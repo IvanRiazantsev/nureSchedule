@@ -105,6 +105,17 @@ public class App extends Application {
         return calendar.getTime();
     }
 
+    public static Calendar getStartOfDayCalendar(Date date) {
+        Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar;
+    }
+
     public static Date getStartOfNextDay(Date date) {
         Calendar calendar = Calendar.getInstance(locale);
         calendar.setTimeZone(TimeZone.getTimeZone("Europe/Kiev"));

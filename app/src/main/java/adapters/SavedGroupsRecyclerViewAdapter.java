@@ -3,11 +3,8 @@ package adapters;
 
 import android.annotation.SuppressLint;
 
-import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Message;
-import android.preference.PreferenceManager;
-import android.text.format.DateUtils;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applandeo.materialcalendarview.CalendarView;
+import com.applandeo.materialcalendarview.builders.DatePickerBuilder;
+import com.applandeo.materialcalendarview.listeners.OnSelectDateListener;
 import com.example.ivanriazantsev.nureschedule.App;
 import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
@@ -27,15 +27,11 @@ import com.example.ivanriazantsev.nureschedule.SemesterFragment;
 import com.example.ivanriazantsev.nureschedule.WeekFragment;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Timer;
 
 import androidx.annotation.NonNull;
 
@@ -44,7 +40,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import api.Group;
 
-import api.Main;
 import api.Teacher;
 import database.AppDatabase;
 import database.EventDAO;
@@ -54,7 +49,6 @@ import database.TeacherDAO;
 import database.TypeDAO;
 import events.Event;
 import events.Events;
-import events.Subject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -138,6 +132,15 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                         WeekFragment.sectionAdapter.removeAllSections();
                         WeekFragment.sectionAdapter.notifyDataSetChanged();
                         WeekFragment.weekPlaceholder.setVisibility(View.VISIBLE);
+
+                        SemesterFragment.semesterPlaceholder.setVisibility(View.VISIBLE);
+                        SemesterFragment.timeline.setVisibility(View.GONE);
+                        SemesterFragment.semesterRecyclerView.setVisibility(View.GONE);
+                        SemesterFragment.semesterRecyclerAdapter.clearList();
+                        if (groupDAO.getSelected().getName().equals(name.getText().toString())) {
+                            MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(false);
+                        }
+                        groupDAO.updateIsSelected(false, name.getText().toString());
                     }
                     if (mList.get(position) instanceof Group) {
                         groupDAO.deleteGroup((Group) mList.get(position));
@@ -161,6 +164,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
 
                     eventDAO.deleteAllForGroup(name.getText().toString());
                     updateDate.setText("Не обновлялось");
+
                 });
                 deleteDialog.setNegativeButton("Отменить", null);
                 deleteDialog.setCancelable(true);
@@ -170,14 +174,18 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
             });
 
             refreshButton.setOnClickListener(v -> {
+                refreshButton.setClickable(false);
+                removeButton.setClickable(false);
+                settingsButton.setClickable(false);
+                MainActivity.deleteGroupsFAB.setClickable(false);
+                MainActivity.refreshGroupsFAB.setClickable(false);
                 Object instance = mList.get(getAdapterPosition());
 
                 Animation rotateAnimation = AnimationUtils.loadAnimation(itemView.getContext(), R.anim.rotate);
                 rotateAnimation.setRepeatCount(Animation.INFINITE);
                 refreshButton.startAnimation(rotateAnimation);
-                ((MainActivity) MainActivity.savedGroupsPlaceholder.
-                        getContext()).getWindow().
-                        setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+
 
                 App.getCistAPI().getEventsForGroup(
                         instance instanceof Group ? groupDAO.getById(((Group) instance).getId()).getId()
@@ -186,15 +194,24 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     @Override
                     public void onResponse(Call<Events> call, Response<Events> response) {
                         if (response.code() == 200) {
+                            eventDAO.deleteAllForGroup(name.getText().toString());
                             typeDAO.insertTypesList(response.body().getTypes());
                             subjectDAO.insertSubjectsList(response.body().getSubjects());
-                            eventDAO.deleteAllForGroup(name.getText().toString());
+
                             List<Event> events = response.body().getEvents();
                             for (Event event : events) {
                                 event.setForGroup(name.getText().toString());
                             }
+                            for (int i = 0; i < events.size(); i++) {
+                                if (!events.get(i).getGroups().contains(groupDAO.getByName(name.getText().toString()).getId())) {
+                                    events.remove(i);
+                                    i--;
+                                }
+                            }
+                            removeDuplicates(events);
+
                             eventDAO.insertEventsList(events);
-                            if (!updateDate.getText().toString().equals("Не обновлялось")) {
+                            if (groupDAO.getSelected() != null && groupDAO.getSelected().getName().equals(name.getText().toString())) {
                                 savedGroupOrTeacher.callOnClick();
                             }
                             String refreshDateString = "Обновлено " + App.getCurrentFullDate();
@@ -204,22 +221,29 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                             else
                                 teacherDAO.updateTeacherRefreshDate(refreshDateString, name.getText().toString());
                             refreshButton.clearAnimation();
-                            ((MainActivity) MainActivity.savedGroupsPlaceholder.
-                                    getContext()).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                            refreshButton.setClickable(true);
+                            removeButton.setClickable(true);
+                            settingsButton.setClickable(true);
+                            MainActivity.deleteGroupsFAB.setClickable(true);
+                            MainActivity.refreshGroupsFAB.setClickable(true);
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Events> call, Throwable t) {
                         refreshButton.clearAnimation();
-                        ((MainActivity) MainActivity.savedGroupsPlaceholder.
-                                getContext()).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        refreshButton.setClickable(true);
+                        removeButton.setClickable(true);
+                        settingsButton.setClickable(true);
+                        MainActivity.deleteGroupsFAB.setClickable(true);
+                        MainActivity.refreshGroupsFAB.setClickable(true);
                         Toast.makeText(itemView.getContext(), "Ошибка", Toast.LENGTH_SHORT).show();
                     }
                 });
 
 
             });
+
 
             savedGroupOrTeacher.setOnClickListener(v -> {
                 if (updateDate.getText().toString().equals("Не обновлялось")) {
@@ -232,13 +256,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 List<Event> eventsForWeek = eventDAO.getEventsBetweenTwoDatesForGroup(name.getText().toString(),
                         (int) (currentDay.getTime() / 1000L), (int) (dayInAWeek.getTime() / 1000L));
 
-                for (int i = 0; i < eventsForWeek.size(); i++) {
-                    List<Integer> list = eventsForWeek.get(i).getGroups();
-                    if (!list.contains(groupDAO.getByName(name.getText().toString()).getId())) {
-                        eventsForWeek.remove(i);
-                        i--;
-                    }
-                }
+
 
                 List<Event> firstDay = new ArrayList<>();
                 List<Event> secondDay = new ArrayList<>();
@@ -269,13 +287,6 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 }
 
 
-                removeDuplicates(firstDay);
-                removeDuplicates(secondDay);
-                removeDuplicates(thirdDay);
-                removeDuplicates(fourthDay);
-                removeDuplicates(fifthDay);
-                removeDuplicates(sixthDay);
-                removeDuplicates(seventhDay);
 
 
                 eventsByDaysList.add(0, firstDay);
@@ -316,22 +327,16 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
 
                 Date end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName())))));
 
+                long millisSinceBegin = new Date().getTime() - begin.getTime();
+                long daysSinceBegin = millisSinceBegin / 1000 / 60 / 60 / 24;
+
                 ArrayMap<Event, List<Event>> simultaneousEvents = new ArrayMap<>();
+
 
 
                 for (long i = begin.getTime(); i < end.getTime(); i += 86400000) {
                     List<Event> eventsForDay = eventDAO.getEventsBetweenTwoDatesForGroup(groupDAO.getSelected().getName(), (int) (i / 1000), (int) ((i + 86400000) / 1000));
 
-                    for (int z = 0; z < eventsForDay.size(); z++) {
-                        List<Integer> list = eventsForDay.get(z).getGroups();
-                        if (!list.contains(groupDAO.getByName(name.getText().toString()).getId())) {
-                            eventsForDay.remove(z);
-                            z--;
-                        }
-                    }
-
-
-                    removeDuplicates(eventsForDay);
                     for (int j = 0; j < eventsForDay.size(); j++) {
                         Integer startTime = eventsForDay.get(j).getStartTime();
                         Event current = eventsForDay.get(j);
@@ -348,10 +353,26 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     events.add(eventsForDay);
                 }
 
+                SemesterFragment.semesterRecyclerAdapter.clearList();
                 SemesterFragment.semesterRecyclerAdapter.setSimultaneousEvents(events, simultaneousEvents);
                 SemesterFragment.semesterRecyclerView.setItemAnimator(null);
                 SemesterFragment.semesterRecyclerView.setAdapter(SemesterFragment.semesterRecyclerAdapter);
                 SemesterFragment.semesterPlaceholder.setVisibility(View.GONE);
+                SemesterFragment.timeline.setVisibility(View.VISIBLE);
+                SemesterFragment.semesterRecyclerView.setVisibility(View.VISIBLE);
+                SemesterFragment.semesterRecyclerView.scrollToPosition((int) daysSinceBegin);
+
+
+                SemesterFragment.builder = new DatePickerBuilder(itemView.getContext(), new OnSelectDateListener() {
+                    @Override
+                    public void onSelect(List<Calendar> calendar) {
+                        SemesterFragment.semesterRecyclerView.scrollToPosition((int)((calendar.get(0).getTimeInMillis() - begin.getTime()) / 1000 / 60 / 60 / 24));
+                    }
+                }).pickerType(CalendarView.ONE_DAY_PICKER).minimumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMinTimeForGroup(groupDAO.getSelected().getName()))))
+                        .maximumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName()))))
+                        .daysLabelsColor(R.color.colorAccent).pagesColor(R.color.pagesColor).headerColor(R.color.colorBackground);
+
+                MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
 
             });
 
@@ -374,7 +395,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 if (i + 1 != list.size()) {
                     if (list.get(i).getSubjectId().equals(list.get(i + 1).getSubjectId())
                             && list.get(i).getNumberPair().equals(list.get(i + 1).getNumberPair())
-                            && list.get(i).getType().equals(list.get(i + 1).getType())) {
+                            && list.get(i).getType().equals(list.get(i + 1).getType()) && list.get(i).getStartTime().equals(list.get(i+1).getStartTime())) {
                         list.get(i).setAuditory(list.get(i).getAuditory() + ", " + list.get(i + 1).getAuditory());
                         List<Integer> teachers = list.get(i).getTeachers();
                         if (list.get(i + 1).getTeachers() != null) {

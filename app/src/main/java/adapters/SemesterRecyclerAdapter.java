@@ -26,6 +26,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import database.AppDatabase;
+import database.EventDAO;
+import database.GroupDAO;
 import database.SubjectDAO;
 import database.TypeDAO;
 import events.Event;
@@ -38,15 +40,23 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
     private AppDatabase database = App.getDatabase();
     private SubjectDAO subjectDAO = database.subjectDAO();
     private TypeDAO typeDAO = database.typeDAO();
-    private  List<List<Event>> eventsListCopy = new ArrayList<>();
+    private List<List<Event>> eventsListCopy = new ArrayList<>();
+    private EventDAO eventDAO = database.eventDAO();
+    private GroupDAO groupDAO = database.groupDAO();
+
 
     ArrayMap<Event, List<Event>> simultaneousEvents;
 
+    Date begin;
+    Date end;
 
-    @SuppressLint("NewApi")
+
+
     public void setSimultaneousEvents(List<List<Event>> eventsLists, ArrayMap<Event, List<Event>> simultaneousEvents) {
         this.simultaneousEvents = simultaneousEvents;
+        begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(groupDAO.getSelected().getName()))));
 
+        end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName())))));
 
         this.eventsLists = eventsLists;
 
@@ -66,9 +76,12 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
     }
 
     public void clearList() {
-        eventsLists.clear();
-        eventsListCopy.clear();
-        notifyDataSetChanged();
+        if (eventsLists != null) {
+            eventsLists.clear();
+            eventsListCopy.clear();
+            simultaneousEvents.clear();
+            notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -87,8 +100,13 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
     public void onBindViewHolder(@NonNull SemesterViewHolder holder, int position) {
 
         List<Event> eventsForDay = eventsLists.get(position);
-        if (eventsForDay.size() != 0 && App.getStartOfDay(new Date(eventsForDay.get(0).getStartTime() * 1000)).getTime() == App.getStartOfDay(new Date()).getTime())
-            holder.date.setTextColor(Color.argb(255, 107, 14, 214));
+
+        holder.date.setText(App.getDateForSemester(begin.getTime() / 1000 + position * 86400));
+
+
+        if (eventsForDay.size() != 0 && App.getDateForSemester((long) eventsForDay.get(0).getStartTime()).equals(App.getDateForSemester(new Date().getTime() / 1000))) {
+            holder.date.setTextColor(Color.argb(255,116,55,165));
+        }
         //TODO: empty days dates
         List<Event> eventsForDayCopy = eventsListCopy.get(position);
 

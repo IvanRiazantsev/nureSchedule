@@ -8,14 +8,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
+import com.applandeo.materialcalendarview.CalendarView;
+import com.applandeo.materialcalendarview.builders.DatePickerBuilder;
+import com.applandeo.materialcalendarview.listeners.OnSelectDateListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,6 +29,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import database.AppDatabase;
+import database.EventDAO;
+import database.GroupDAO;
 
 
 public class SemesterFragment extends Fragment {
@@ -34,6 +42,11 @@ public class SemesterFragment extends Fragment {
     public static RecyclerView semesterRecyclerView;
     public static SemesterRecyclerAdapter semesterRecyclerAdapter = new SemesterRecyclerAdapter();
     public static TextView semesterPlaceholder;
+    public static LinearLayout timeline;
+    public static DatePickerBuilder builder;
+    private AppDatabase database = App.getDatabase();
+    private GroupDAO groupDAO = database.groupDAO();
+    private EventDAO eventDAO = database.eventDAO();
 
 
     public SemesterFragment() {
@@ -53,9 +66,11 @@ public class SemesterFragment extends Fragment {
 
 
         semesterPlaceholder = view.findViewById(R.id.semesterPlaceholder);
+        timeline = view.findViewById(R.id.timeline);
 
         semesterRecyclerView = view.findViewById(R.id.semesterRecyclerView);
         semesterRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
 
 
         return view;

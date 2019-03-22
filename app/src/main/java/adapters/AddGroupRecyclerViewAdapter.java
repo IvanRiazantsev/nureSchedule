@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.example.ivanriazantsev.nureschedule.App;
 import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Collection;

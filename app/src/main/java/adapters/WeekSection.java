@@ -4,6 +4,7 @@ import android.os.CountDownTimer;
 import android.util.ArrayMap;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -34,6 +35,7 @@ public class WeekSection extends StatelessSection {
     private SubjectDAO subjectDAO = App.getDatabase().subjectDAO();
     private TypeDAO typeDAO = App.getDatabase().typeDAO();
     ArrayMap<Event, List<Event>> simultaneousEvents = new ArrayMap<>();
+    PopupWindow popupWindow;
 
 
 
