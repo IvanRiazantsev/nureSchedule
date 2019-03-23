@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.builders.DatePickerBuilder;
 import com.applandeo.materialcalendarview.listeners.OnSelectDateListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -24,7 +26,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import adapters.SavedGroupsRecyclerViewAdapter;
 import adapters.SemesterRecyclerAdapter;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,11 +47,12 @@ public class SemesterFragment extends Fragment {
     public static SemesterRecyclerAdapter semesterRecyclerAdapter = new SemesterRecyclerAdapter();
     public static TextView semesterPlaceholder;
     public static LinearLayout timeline;
-    public static DatePickerBuilder builder;
+    public static DatePickerBuilder datePickerBuilder;
     private AppDatabase database = App.getDatabase();
     private GroupDAO groupDAO = database.groupDAO();
     private EventDAO eventDAO = database.eventDAO();
 
+    public static FloatingActionButton backToTodayFAB;
 
     public SemesterFragment() {
     }
@@ -64,13 +69,19 @@ public class SemesterFragment extends Fragment {
         });
 
 
-
         semesterPlaceholder = view.findViewById(R.id.semesterPlaceholder);
         timeline = view.findViewById(R.id.timeline);
+        backToTodayFAB = view.findViewById(R.id.backToTodayFAB);
 
         semesterRecyclerView = view.findViewById(R.id.semesterRecyclerView);
         semesterRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
+        backToTodayFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                semesterRecyclerView.scrollToPosition((int) ((new Date().getTime() - SavedGroupsRecyclerViewAdapter.begin.getTime()) / 1000 / 60 / 60 / 24));
+            }
+        });
 
 
         return view;

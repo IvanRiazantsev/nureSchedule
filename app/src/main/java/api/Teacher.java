@@ -23,7 +23,11 @@ public class Teacher {
     @Expose
     private String fullName;
 
-    private String refreshDate = null;
+    private String refreshDate = "Не обновлялось";
+
+    private Boolean isSelected = false;
+
+    private Boolean isAdded = false;
 
     public Integer getId() {
         return id;
@@ -55,5 +59,21 @@ public class Teacher {
 
     public void setRefreshDate(String refreshDate) {
         this.refreshDate = refreshDate;
+    }
+
+    public Boolean getSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(Boolean selected) {
+        isSelected = selected;
+    }
+
+    public Boolean getAdded() {
+        return isAdded;
+    }
+
+    public void setAdded(Boolean added) {
+        isAdded = added;
     }
 }

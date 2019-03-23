@@ -31,6 +31,7 @@ public class App extends Application {
     public static ArrayMap<String, Integer> eventsColors = new ArrayMap<>();
 
 
+
     @Override
     public void onCreate() {
         super.onCreate();

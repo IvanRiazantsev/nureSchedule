@@ -45,6 +45,27 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
         notifyDataSetChanged();
     }
 
+    public void updateItem(Object object) {
+        if (object instanceof Group) {
+            for (int i = 0; i < mList.size(); i++) {
+                if (((Group) mList.get(i)).getId().equals(((Group) object).getId())) {
+                    mList.set(i, object);
+                    notifyItemChanged(i);
+                    return;
+                }
+            }
+        } else {
+            for (int i = 0; i < mList.size(); i++) {
+                if (((Teacher) mList.get(i)).getId().equals(((Teacher) object).getId())) {
+                    mList.set(i, object);
+                    notifyItemChanged(i);
+                    return;
+                }
+            }
+        }
+
+    }
+
     public void clearList() {
         mList.clear();
         notifyDataSetChanged();
@@ -67,6 +88,10 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
         return mList.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
 
     public void filterList(List<Object> list) {
         mList = list;
@@ -90,19 +115,37 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
 
                 try {
                     if (mList.get(position) instanceof Group) {
-                        ((Group) mList.get(position)).setRefreshDate("Не обновлялось");
-                        groupDAO.insertGroup((Group) mList.get(position));
+
+                        if (groupDAO.getById(((Group) mList.get(position)).getId()) != null
+                                && groupDAO.getById(((Group) mList.get(position)).getId()).getName().equals(((Group) mList.get(position)).getName())) {
+                            if (!groupDAO.isAddedByName(((Group) mList.get(position)).getName())) {
+                                groupDAO.setAddedByName(true, ((Group) mList.get(position)).getName());
+                            } else {
+                                throw new SQLiteConstraintException();
+                            }
+                        } else {
+                            groupDAO.insertGroup((Group) mList.get(position));
+                            groupDAO.setAddedByName(true, ((Group) mList.get(position)).getName());
+                        }
+                        MainActivity.savedGroupsAdapter.addToList(mList.get(position));
+                    } else if (mList.get(position) instanceof Teacher) {
+
+                        if (teacherDAO.getById(((Teacher) mList.get(position)).getId()) != null
+                                && teacherDAO.getById(((Teacher) mList.get(position)).getId()).getShortName().equals(((Teacher) mList.get(position)).getShortName())) {
+                            if (!teacherDAO.isAddedByName(((Teacher) mList.get(position)).getShortName())) {
+                                teacherDAO.setAddedByName(true, ((Teacher) mList.get(position)).getShortName());
+                            } else {
+                                throw new SQLiteConstraintException();
+                            }
+                        } else {
+                            teacherDAO.insertTeacher((Teacher) mList.get(position));
+                            teacherDAO.setAddedByName(true, ((Teacher) mList.get(position)).getShortName());
+                        }
+                        MainActivity.savedGroupsAdapter.clearList();
+                        MainActivity.savedGroupsAdapter.setList(groupDAO.getAllAdded(), teacherDAO.getAllAdded());
                     }
-                    else if (mList.get(position) instanceof Teacher) {
-                        ((Teacher) mList.get(position)).setRefreshDate("Не обновлялось");
-                        teacherDAO.insertTeacher((Teacher) mList.get(position));
-                    }
-                    MainActivity.savedGroupsAdapter.clearList();
-                    MainActivity.savedGroupsAdapter.setList(groupDAO.getAll(), teacherDAO.getAll());
-                    MainActivity.savedGroupsAdapter.notifyDataSetChanged();
                     MainActivity.savedGroupsPlaceholder.setVisibility(View.GONE);
-                    MainActivity.refreshGroupsFAB.setVisibility(View.VISIBLE);
-                    MainActivity.deleteGroupsFAB.setVisibility(View.VISIBLE);
+
 
                     Toast.makeText(v.getContext(), "Добавлено", Toast.LENGTH_SHORT).show();
                 } catch (SQLiteConstraintException e) {
@@ -122,7 +165,6 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
         }
 
     }
-
 
 
 }

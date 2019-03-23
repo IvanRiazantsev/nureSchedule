@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -36,7 +38,6 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapt
 public class WeekFragment extends Fragment {
 
     View view;
-    RecyclerView eventsRecyclerView;
     Timer mTimer;
     MyTimerTask mTimerTask;
 
@@ -46,7 +47,6 @@ public class WeekFragment extends Fragment {
     private AppDatabase database = App.getDatabase();
     private GroupDAO groupDAO = database.groupDAO();
     private EventDAO eventDAO = database.eventDAO();
-
 
     public WeekFragment() {
     }
@@ -64,8 +64,13 @@ public class WeekFragment extends Fragment {
 
         weekRecyclerView = view.findViewById(R.id.weekRecyclerView);
         weekRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        weekRecyclerView.setOnClickListener(onOutsideClickListener);
         weekRecyclerView.setItemAnimator(null);
+
+
+
+
+
+
 
         Group selectedGroup = groupDAO.getSelected();
         if (selectedGroup != null) {

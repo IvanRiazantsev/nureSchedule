@@ -13,8 +13,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.ivanriazantsev.nureschedule.App;
+import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
 import com.example.ivanriazantsev.nureschedule.SemesterFragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,9 +31,10 @@ import database.AppDatabase;
 import database.EventDAO;
 import database.GroupDAO;
 import database.SubjectDAO;
+import database.TeacherDAO;
 import database.TypeDAO;
 import events.Event;
-import events.Type;
+
 
 public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecyclerAdapter.SemesterViewHolder> {
 
@@ -43,6 +46,7 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
     private List<List<Event>> eventsListCopy = new ArrayList<>();
     private EventDAO eventDAO = database.eventDAO();
     private GroupDAO groupDAO = database.groupDAO();
+    private TeacherDAO teacherDAO = database.teacherDAO();
 
 
     ArrayMap<Event, List<Event>> simultaneousEvents;
@@ -54,9 +58,15 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
 
     public void setSimultaneousEvents(List<List<Event>> eventsLists, ArrayMap<Event, List<Event>> simultaneousEvents) {
         this.simultaneousEvents = simultaneousEvents;
-        begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(groupDAO.getSelected().getName()))));
+        if (groupDAO.getSelected() != null) {
+            begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(groupDAO.getSelected().getName()))));
 
-        end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName())))));
+            end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName())))));
+        } else if (teacherDAO.getSelected() != null) {
+            begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(teacherDAO.getSelected().getShortName()))));
+
+            end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(teacherDAO.getSelected().getShortName())))));
+        }
 
         this.eventsLists = eventsLists;
 
@@ -84,6 +94,7 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
         }
     }
 
+
     @Override
     public int getItemViewType(int position) {
         return position;
@@ -96,6 +107,7 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
         return new SemesterViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull SemesterViewHolder holder, int position) {
 
@@ -104,10 +116,12 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
         holder.date.setText(App.getDateForSemester(begin.getTime() / 1000 + position * 86400));
 
 
-        if (eventsForDay.size() != 0 && App.getDateForSemester((long) eventsForDay.get(0).getStartTime()).equals(App.getDateForSemester(new Date().getTime() / 1000))) {
+//        if (eventsForDay.size() != 0 && App.getDateForSemester((long) eventsForDay.get(0).getStartTime()).equals(App.getDateForSemester(new Date().getTime() / 1000))) {
+//            holder.date.setTextColor(Color.argb(255,116,55,165));
+//        }
+        if (App.getDateForSemester(new Date().getTime() / 1000).equals(holder.date.getText().toString())) {
             holder.date.setTextColor(Color.argb(255,116,55,165));
         }
-        //TODO: empty days dates
         List<Event> eventsForDayCopy = eventsListCopy.get(position);
 
 
@@ -150,6 +164,36 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                             notifyItemChanged(position);
                         });
                     }
+
+                    int finalI1 = i;
+                    holder.card1.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            MainActivity.bottomEventName.setText(subjectDAO.getById(eventsLists.get(position).get(finalI1).getSubjectId()).getTitle());
+                            MainActivity.bottomRoom.setText(eventsLists.get(position).get(finalI1).getAuditory());
+                            MainActivity.bottomType.setText(typeDAO.getById(eventsLists.get(position).get(finalI1).getType()).getShortName());
+
+                            StringBuilder groups = new StringBuilder();
+                            for (Integer integer : eventsLists.get(position).get(finalI1).getGroups()) {
+                                groups.append(groupDAO.getById(integer).getName()).append("\n");
+                            }
+                            groups.deleteCharAt(groups.lastIndexOf("\n"));
+                            MainActivity.bottomGroups.setText(groups.toString());
+
+                            StringBuilder teachers = new StringBuilder();
+                            if (eventsLists.get(position).get(finalI1).getTeachers() != null) {
+                                for (Integer integer : eventsLists.get(position).get(finalI1).getTeachers()) {
+                                    teachers.append(teacherDAO.getById(integer).getFullName()).append("\n");
+                                }
+                                teachers.deleteCharAt(teachers.lastIndexOf("\n"));
+                            }
+                            MainActivity.bottomTeacher.setText(teachers.toString());
+
+                            MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        }
+                    });
                     break;
                 case 2:
                     holder.date.setText(App.getDateForSemester((long) (event.getStartTime())));
@@ -183,6 +227,35 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                             notifyItemChanged(position);
                         });
                     }
+                    finalI1 = i;
+                    holder.card2.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            MainActivity.bottomEventName.setText(subjectDAO.getById(eventsLists.get(position).get(finalI1).getSubjectId()).getTitle());
+                            MainActivity.bottomRoom.setText(eventsLists.get(position).get(finalI1).getAuditory());
+                            MainActivity.bottomType.setText(typeDAO.getById(eventsLists.get(position).get(finalI1).getType()).getShortName());
+
+                            StringBuilder groups = new StringBuilder();
+                            for (Integer integer : eventsLists.get(position).get(finalI1).getGroups()) {
+                                groups.append(groupDAO.getById(integer).getName()).append("\n");
+                            }
+                            groups.deleteCharAt(groups.lastIndexOf("\n"));
+                            MainActivity.bottomGroups.setText(groups.toString());
+
+                            StringBuilder teachers = new StringBuilder();
+                            if (eventsLists.get(position).get(finalI1).getTeachers() != null) {
+                                for (Integer integer : eventsLists.get(position).get(finalI1).getTeachers()) {
+                                    teachers.append(teacherDAO.getById(integer).getFullName()).append("\n");
+                                }
+                                teachers.deleteCharAt(teachers.lastIndexOf("\n"));
+                            }
+                            MainActivity.bottomTeacher.setText(teachers.toString());
+
+                            MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        }
+                    });
                     break;
                 case 3:
                     holder.date.setText(App.getDateForSemester((long) (event.getStartTime())));
@@ -217,6 +290,35 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                             notifyItemChanged(position);
                         });
                     }
+                    finalI1 = i;
+                    holder.card3.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            MainActivity.bottomEventName.setText(subjectDAO.getById(eventsLists.get(position).get(finalI1).getSubjectId()).getTitle());
+                            MainActivity.bottomRoom.setText(eventsLists.get(position).get(finalI1).getAuditory());
+                            MainActivity.bottomType.setText(typeDAO.getById(eventsLists.get(position).get(finalI1).getType()).getShortName());
+
+                            StringBuilder groups = new StringBuilder();
+                            for (Integer integer : eventsLists.get(position).get(finalI1).getGroups()) {
+                                groups.append(groupDAO.getById(integer).getName()).append("\n");
+                            }
+                            groups.deleteCharAt(groups.lastIndexOf("\n"));
+                            MainActivity.bottomGroups.setText(groups.toString());
+
+                            StringBuilder teachers = new StringBuilder();
+                            if (eventsLists.get(position).get(finalI1).getTeachers() != null) {
+                                for (Integer integer : eventsLists.get(position).get(finalI1).getTeachers()) {
+                                    teachers.append(teacherDAO.getById(integer).getFullName()).append("\n");
+                                }
+                                teachers.deleteCharAt(teachers.lastIndexOf("\n"));
+                            }
+                            MainActivity.bottomTeacher.setText(teachers.toString());
+
+                            MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        }
+                    });
                     break;
                 case 4:
                     holder.date.setText(App.getDateForSemester((long) (event.getStartTime())));
@@ -250,6 +352,35 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                             notifyItemChanged(position);
                         });
                     }
+                    finalI1 = i;
+                    holder.card4.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            MainActivity.bottomEventName.setText(subjectDAO.getById(eventsLists.get(position).get(finalI1).getSubjectId()).getTitle());
+                            MainActivity.bottomRoom.setText(eventsLists.get(position).get(finalI1).getAuditory());
+                            MainActivity.bottomType.setText(typeDAO.getById(eventsLists.get(position).get(finalI1).getType()).getShortName());
+
+                            StringBuilder groups = new StringBuilder();
+                            for (Integer integer : eventsLists.get(position).get(finalI1).getGroups()) {
+                                groups.append(groupDAO.getById(integer).getName()).append("\n");
+                            }
+                            groups.deleteCharAt(groups.lastIndexOf("\n"));
+                            MainActivity.bottomGroups.setText(groups.toString());
+
+                            StringBuilder teachers = new StringBuilder();
+                            if (eventsLists.get(position).get(finalI1).getTeachers() != null) {
+                                for (Integer integer : eventsLists.get(position).get(finalI1).getTeachers()) {
+                                    teachers.append(teacherDAO.getById(integer).getFullName()).append("\n");
+                                }
+                                teachers.deleteCharAt(teachers.lastIndexOf("\n"));
+                            }
+                            MainActivity.bottomTeacher.setText(teachers.toString());
+
+                            MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        }
+                    });
                     break;
                 case 5:
                     holder.date.setText(App.getDateForSemester((long) (event.getStartTime())));
@@ -283,6 +414,35 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                             notifyItemChanged(position);
                         });
                     }
+                    finalI1 = i;
+                    holder.card5.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            MainActivity.bottomEventName.setText(subjectDAO.getById(eventsLists.get(position).get(finalI1).getSubjectId()).getTitle());
+                            MainActivity.bottomRoom.setText(eventsLists.get(position).get(finalI1).getAuditory());
+                            MainActivity.bottomType.setText(typeDAO.getById(eventsLists.get(position).get(finalI1).getType()).getShortName());
+
+                            StringBuilder groups = new StringBuilder();
+                            for (Integer integer : eventsLists.get(position).get(finalI1).getGroups()) {
+                                groups.append(groupDAO.getById(integer).getName()).append("\n");
+                            }
+                            groups.deleteCharAt(groups.lastIndexOf("\n"));
+                            MainActivity.bottomGroups.setText(groups.toString());
+
+                            StringBuilder teachers = new StringBuilder();
+                            if (eventsLists.get(position).get(finalI1).getTeachers() != null) {
+                                for (Integer integer : eventsLists.get(position).get(finalI1).getTeachers()) {
+                                    teachers.append(teacherDAO.getById(integer).getFullName()).append("\n");
+                                }
+                                teachers.deleteCharAt(teachers.lastIndexOf("\n"));
+                            }
+                            MainActivity.bottomTeacher.setText(teachers.toString());
+
+                            MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        }
+                    });
                     break;
                 case 6:
                     holder.date.setText(App.getDateForSemester((long) (event.getStartTime())));
@@ -317,6 +477,35 @@ public class SemesterRecyclerAdapter extends RecyclerView.Adapter<SemesterRecycl
                             notifyItemChanged(position);
                         });
                     }
+                    finalI1 = i;
+                    holder.card6.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            MainActivity.bottomEventName.setText(subjectDAO.getById(eventsLists.get(position).get(finalI1).getSubjectId()).getTitle());
+                            MainActivity.bottomRoom.setText(eventsLists.get(position).get(finalI1).getAuditory());
+                            MainActivity.bottomType.setText(typeDAO.getById(eventsLists.get(position).get(finalI1).getType()).getShortName());
+
+                            StringBuilder groups = new StringBuilder();
+                            for (Integer integer : eventsLists.get(position).get(finalI1).getGroups()) {
+                                groups.append(groupDAO.getById(integer).getName()).append("\n");
+                            }
+                            groups.deleteCharAt(groups.lastIndexOf("\n"));
+                            MainActivity.bottomGroups.setText(groups.toString());
+
+                            StringBuilder teachers = new StringBuilder();
+                            if (eventsLists.get(position).get(finalI1).getTeachers() != null) {
+                                for (Integer integer : eventsLists.get(position).get(finalI1).getTeachers()) {
+                                    teachers.append(teacherDAO.getById(integer).getFullName()).append("\n");
+                                }
+                                teachers.deleteCharAt(teachers.lastIndexOf("\n"));
+                            }
+                            MainActivity.bottomTeacher.setText(teachers.toString());
+
+                            MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                            MainActivity.bottomSheetBehaviorInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+                        }
+                    });
                     break;
             }
         }

@@ -3,13 +3,10 @@ package adapters;
 
 import android.annotation.SuppressLint;
 
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -63,11 +60,18 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
     private EventDAO eventDAO = database.eventDAO();
     private TypeDAO typeDAO = database.typeDAO();
     private SubjectDAO subjectDAO = database.subjectDAO();
+    public static Date begin;
+    public static Date end;
 
 
     public void setList(Collection<Group> groups, Collection<Teacher> teachers) {
         mList.addAll(groups);
         mList.addAll(teachers);
+        notifyDataSetChanged();
+    }
+
+    public void addToList(Object object) {
+        mList.add(object instanceof Group ? (Group) object : (Teacher) object);
         notifyDataSetChanged();
     }
 
@@ -81,6 +85,11 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
     public SavedGroupsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.saved_groups_recycler_item, parent, false);
         return new SavedGroupsViewHolder(view);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     @Override
@@ -124,10 +133,10 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 deleteDialog.setPositiveButton("Удалить", (dialog, which) -> {
                     int position = getAdapterPosition();
 
-                    //TODO: teacher
-                    if (groupDAO.getSelected() != null && groupDAO.getSelected().getName()
-                            .equals(mList.get(position) instanceof Group
-                                    ? ((Group) mList.get(position)).getName() : ((Teacher) mList.get(position)).getShortName())) {
+                    if ((groupDAO.getSelected() != null || teacherDAO.getSelected() != null) && (mList.get(position) instanceof Group
+                            ? ((Group) mList.get(position)).getName().equals(groupDAO.getSelected().getName())
+                            : ((Teacher) mList.get(position)).getShortName().equals(teacherDAO.getSelected().getShortName()))) {
+                        //TODO:FIX
                         MainActivity.selectedScheduleName.setText("");
                         WeekFragment.sectionAdapter.removeAllSections();
                         WeekFragment.sectionAdapter.notifyDataSetChanged();
@@ -136,17 +145,32 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                         SemesterFragment.semesterPlaceholder.setVisibility(View.VISIBLE);
                         SemesterFragment.timeline.setVisibility(View.GONE);
                         SemesterFragment.semesterRecyclerView.setVisibility(View.GONE);
+                        SemesterFragment.backToTodayFAB.setVisibility(View.GONE);
                         SemesterFragment.semesterRecyclerAdapter.clearList();
-                        if (groupDAO.getSelected().getName().equals(name.getText().toString())) {
+                        if ((mList.get(getAdapterPosition()) instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName()).equals(name.getText().toString())) {
                             MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(false);
                         }
                         groupDAO.updateIsSelected(false, name.getText().toString());
+                        teacherDAO.updateIsSelected(false, name.getText().toString());
+
                     }
+                    groupDAO.setAddedByName(false, name.getText().toString());
+                    teacherDAO.setAddedByName(false, name.getText().toString());
+                    groupDAO.updateGroupRefreshDate("Не обновлялось", name.getText().toString());
+                    teacherDAO.updateTeacherRefreshDate("Не обновлялось", name.getText().toString());
+
+
                     if (mList.get(position) instanceof Group) {
-                        groupDAO.deleteGroup((Group) mList.get(position));
-                    } else if (mList.get(position) instanceof Teacher) {
-                        teacherDAO.deleteTeacher((Teacher) mList.get(position));
+                        ((Group) mList.get(position)).setRefreshDate("Не обновлялось");
+                        ((Group) mList.get(position)).setAdded(false);
+                        ((Group) mList.get(position)).setSelected(false);
+                    } else {
+                        ((Teacher) mList.get(position)).setRefreshDate("Не обновлялось");
+                        ((Teacher) mList.get(position)).setAdded(false);
+                        ((Teacher) mList.get(position)).setSelected(false);
+                        MainActivity.addGroupRecyclerViewAdapter.updateItem(mList.get(position));
                     }
+
                     mList.remove(position);
 
                     notifyItemRemoved(position);
@@ -186,7 +210,6 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 refreshButton.startAnimation(rotateAnimation);
 
 
-
                 App.getCistAPI().getEventsForGroup(
                         instance instanceof Group ? groupDAO.getById(((Group) instance).getId()).getId()
                                 : teacherDAO.getById(((Teacher) instance).getId()).getId(),
@@ -197,29 +220,41 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                             eventDAO.deleteAllForGroup(name.getText().toString());
                             typeDAO.insertTypesList(response.body().getTypes());
                             subjectDAO.insertSubjectsList(response.body().getSubjects());
+                            teacherDAO.insertTeachersList(response.body().getTeachers());
+                            groupDAO.insertGroupsList(response.body().getGroups());
 
                             List<Event> events = response.body().getEvents();
                             for (Event event : events) {
                                 event.setForGroup(name.getText().toString());
                             }
-                            for (int i = 0; i < events.size(); i++) {
-                                if (!events.get(i).getGroups().contains(groupDAO.getByName(name.getText().toString()).getId())) {
-                                    events.remove(i);
-                                    i--;
+
+                            if (mList.get(getAdapterPosition()) instanceof Group) {
+
+                                for (int i = 0; i < events.size(); i++) {
+                                    if (!events.get(i).getGroups().contains(groupDAO.getByName(name.getText().toString()).getId())) {
+                                        events.remove(i);
+                                        i--;
+                                    }
                                 }
+
+                                removeDuplicates(events);
                             }
-                            removeDuplicates(events);
 
                             eventDAO.insertEventsList(events);
-                            if (groupDAO.getSelected() != null && groupDAO.getSelected().getName().equals(name.getText().toString())) {
+                            if ((mList.get(getAdapterPosition()) instanceof Group ? groupDAO.getSelected() : teacherDAO.getSelected()) != null
+                                    && (mList.get(getAdapterPosition()) instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName()).equals(name.getText().toString())) {
                                 savedGroupOrTeacher.callOnClick();
                             }
                             String refreshDateString = "Обновлено " + App.getCurrentFullDate();
                             updateDate.setText(refreshDateString);
-                            if (instance instanceof Group)
+                            if (instance instanceof Group) {
                                 groupDAO.updateGroupRefreshDate(refreshDateString, name.getText().toString());
-                            else
+                                ((Group) instance).setRefreshDate(refreshDateString);
+                            } else {
                                 teacherDAO.updateTeacherRefreshDate(refreshDateString, name.getText().toString());
+                                ((Teacher) instance).setRefreshDate(refreshDateString);
+                            }
+                            MainActivity.addGroupRecyclerViewAdapter.updateItem(instance);
                             refreshButton.clearAnimation();
                             refreshButton.setClickable(true);
                             removeButton.setClickable(true);
@@ -250,12 +285,12 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     Toast.makeText(itemView.getContext(), "Обновите расписание", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 Date currentDate = new Date();
                 Date currentDay = App.getStartOfDay(currentDate);
                 Date dayInAWeek = App.getStartOfDayInAWeek(currentDate);
                 List<Event> eventsForWeek = eventDAO.getEventsBetweenTwoDatesForGroup(name.getText().toString(),
                         (int) (currentDay.getTime() / 1000L), (int) (dayInAWeek.getTime() / 1000L));
-
 
 
                 List<Event> firstDay = new ArrayList<>();
@@ -287,8 +322,6 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 }
 
 
-
-
                 eventsByDaysList.add(0, firstDay);
                 eventsByDaysList.add(1, secondDay);
                 eventsByDaysList.add(2, thirdDay);
@@ -314,18 +347,24 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
 
                 WeekFragment.weekPlaceholder.setVisibility(View.GONE);
 
-
-                if (groupDAO.getSelected() != null)
-                    groupDAO.updateIsSelected(false, groupDAO.getSelected().getName());
-
-                groupDAO.updateIsSelected(true, name.getText().toString());
+                if (mList.get(getAdapterPosition()) instanceof Group) {
+                    if (groupDAO.getSelected() != null)
+                        groupDAO.updateIsSelected(false, groupDAO.getSelected().getName());
+                    groupDAO.updateIsSelected(true, name.getText().toString());
+                } else {
+                    if (teacherDAO.getSelected() != null)
+                        teacherDAO.updateIsSelected(false, teacherDAO.getSelected().getShortName());
+                    teacherDAO.updateIsSelected(true, name.getText().toString());
+                }
 
 
                 List<List<Event>> events = new ArrayList<>();
 
-                Date begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(groupDAO.getSelected().getName()))));
+                begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(
+                        mList.get(getAdapterPosition()) instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName()))));
 
-                Date end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName())))));
+                end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(
+                        mList.get(getAdapterPosition()) instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName())))));
 
                 long millisSinceBegin = new Date().getTime() - begin.getTime();
                 long daysSinceBegin = millisSinceBegin / 1000 / 60 / 60 / 24;
@@ -333,9 +372,10 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 ArrayMap<Event, List<Event>> simultaneousEvents = new ArrayMap<>();
 
 
-
                 for (long i = begin.getTime(); i < end.getTime(); i += 86400000) {
-                    List<Event> eventsForDay = eventDAO.getEventsBetweenTwoDatesForGroup(groupDAO.getSelected().getName(), (int) (i / 1000), (int) ((i + 86400000) / 1000));
+                    List<Event> eventsForDay = eventDAO.getEventsBetweenTwoDatesForGroup(
+                            mList.get(getAdapterPosition()) instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName(),
+                            (int) (i / 1000), (int) ((i + 86400000) / 1000));
 
                     for (int j = 0; j < eventsForDay.size(); j++) {
                         Integer startTime = eventsForDay.get(j).getStartTime();
@@ -361,18 +401,31 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 SemesterFragment.timeline.setVisibility(View.VISIBLE);
                 SemesterFragment.semesterRecyclerView.setVisibility(View.VISIBLE);
                 SemesterFragment.semesterRecyclerView.scrollToPosition((int) daysSinceBegin);
+                SemesterFragment.backToTodayFAB.setVisibility(View.VISIBLE);
 
+                if (groupDAO.getSelected() != null) {
 
-                SemesterFragment.builder = new DatePickerBuilder(itemView.getContext(), new OnSelectDateListener() {
-                    @Override
-                    public void onSelect(List<Calendar> calendar) {
-                        SemesterFragment.semesterRecyclerView.scrollToPosition((int)((calendar.get(0).getTimeInMillis() - begin.getTime()) / 1000 / 60 / 60 / 24));
-                    }
-                }).pickerType(CalendarView.ONE_DAY_PICKER).minimumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMinTimeForGroup(groupDAO.getSelected().getName()))))
-                        .maximumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName()))))
-                        .daysLabelsColor(R.color.colorAccent).pagesColor(R.color.pagesColor).headerColor(R.color.colorBackground);
+                    SemesterFragment.datePickerBuilder = new DatePickerBuilder(itemView.getContext(), new OnSelectDateListener() {
+                        @Override
+                        public void onSelect(List<Calendar> calendar) {
+                            SemesterFragment.semesterRecyclerView.scrollToPosition((int) ((calendar.get(0).getTimeInMillis() - begin.getTime()) / 1000 / 60 / 60 / 24));
+                        }
+                    }).pickerType(CalendarView.ONE_DAY_PICKER).minimumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMinTimeForGroup(groupDAO.getSelected().getName()))))
+                            .maximumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName()))))
+                            .daysLabelsColor(R.color.colorAccent).pagesColor(R.color.pagesColor).headerColor(R.color.colorBackground);
+                } else if (teacherDAO.getSelected() != null) {
+                    SemesterFragment.datePickerBuilder = new DatePickerBuilder(itemView.getContext(), new OnSelectDateListener() {
+                        @Override
+                        public void onSelect(List<Calendar> calendar) {
+                            SemesterFragment.semesterRecyclerView.scrollToPosition((int) ((calendar.get(0).getTimeInMillis() - begin.getTime()) / 1000 / 60 / 60 / 24));
+                        }
+                    }).pickerType(CalendarView.ONE_DAY_PICKER).minimumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMinTimeForGroup(teacherDAO.getSelected().getShortName()))))
+                            .maximumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMaxTimeForGroup(teacherDAO.getSelected().getShortName()))))
+                            .daysLabelsColor(R.color.colorAccent).pagesColor(R.color.pagesColor).headerColor(R.color.colorBackground);
+                }
 
-                MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
+                if (MainActivity.active != MainActivity.weekFragment)
+                    MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
 
             });
 
@@ -395,7 +448,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 if (i + 1 != list.size()) {
                     if (list.get(i).getSubjectId().equals(list.get(i + 1).getSubjectId())
                             && list.get(i).getNumberPair().equals(list.get(i + 1).getNumberPair())
-                            && list.get(i).getType().equals(list.get(i + 1).getType()) && list.get(i).getStartTime().equals(list.get(i+1).getStartTime())) {
+                            && list.get(i).getType().equals(list.get(i + 1).getType()) && list.get(i).getStartTime().equals(list.get(i + 1).getStartTime())) {
                         list.get(i).setAuditory(list.get(i).getAuditory() + ", " + list.get(i + 1).getAuditory());
                         List<Integer> teachers = list.get(i).getTeachers();
                         if (list.get(i + 1).getTeachers() != null) {

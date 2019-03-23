@@ -9,6 +9,7 @@
     android:visibility="visible"
     app:behavior_hideable="false"
     android:elevation="16dp"
+    android:clickable="true"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 

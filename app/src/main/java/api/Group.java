@@ -20,9 +20,11 @@ public class Group {
     @Expose
     private String name;
 
-    private String refreshDate = null;
+    private String refreshDate = "Не обновлялось";
 
     private Boolean isSelected = false;
+
+    private Boolean isAdded = false;
 
     public Integer getId() {
         return id;
@@ -55,4 +57,14 @@ public class Group {
     public void setSelected(Boolean selected) {
         isSelected = selected;
     }
+
+    public Boolean getAdded() {
+        return isAdded;
+    }
+
+    public void setAdded(Boolean added) {
+        isAdded = added;
+    }
 }
+
+

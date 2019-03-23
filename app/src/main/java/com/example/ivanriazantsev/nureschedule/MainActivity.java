@@ -25,14 +25,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -48,7 +43,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -61,12 +55,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static Toolbar toolbar;
 
-    final Fragment weekFragment = new WeekFragment();
+    public static final Fragment weekFragment = new WeekFragment();
     final Fragment semesterFragment = new SemesterFragment();
     final Fragment settingsFragment = new SettingsFragment();
 
     final FragmentManager fm = getSupportFragmentManager();
-    Fragment active = weekFragment;
+    public static Fragment active;
     static BottomNavigationView bottomNavigationView;
     AppDatabase database = App.getDatabase();
     GroupDAO groupDAO = database.groupDAO();
@@ -76,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     public static FloatingActionButton refreshGroupsFAB;
     public static FloatingActionButton deleteGroupsFAB;
     public static BottomSheetBehavior bottomSheetBehaviorSavedGroups;
-    static BottomSheetBehavior bottomSheetBehaviorAddGroups;
+    public static BottomSheetBehavior bottomSheetBehaviorAddGroups;
 
 
     private RecyclerView savedGroupsRecyclerView;
@@ -86,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     public static TextView savedGroupsPlaceholder;
 
     private RecyclerView groupsTeachersRecyclerView;
-    public AddGroupRecyclerViewAdapter addGroupRecyclerViewAdapter;
+    public static AddGroupRecyclerViewAdapter addGroupRecyclerViewAdapter;
     public static TextInputEditText searchEditText;
     private List<Group> groupList = new ArrayList<>();
     private List<Teacher> teacherList = new ArrayList<>();
@@ -100,6 +94,14 @@ public class MainActivity extends AppCompatActivity {
 
     DatePicker datePicker;
 
+
+
+    public static BottomSheetBehavior bottomSheetBehaviorInfo;
+    public static TextView bottomEventName;
+    public static TextView bottomType;
+    public static TextView bottomRoom;
+    public static TextView bottomTeacher;
+    public static TextView bottomGroups;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
         switch (item.getItemId()) {
             case R.id.calendarToolbarItem:
-                datePicker = SemesterFragment.builder.build();
+                datePicker = SemesterFragment.datePickerBuilder.build();
                 datePicker.show();
                 return true;
             case R.id.settingsToolbarItem:
@@ -196,12 +198,21 @@ public class MainActivity extends AppCompatActivity {
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        active = weekFragment;
 
 
-        database.clearAllTables();
+        new Thread(() -> database.clearAllTables()).start();
+//        database.clearAllTables();
 
         bottomSheetBehaviorSavedGroups = BottomSheetBehavior.from(findViewById(R.id.groupsBottomSheet));
         bottomSheetBehaviorAddGroups = BottomSheetBehavior.from(findViewById(R.id.addGroupBottomSheet));
+        bottomSheetBehaviorInfo = BottomSheetBehavior.from(findViewById(R.id.infoBottomSheet));
+
+        bottomEventName = findViewById(R.id.popupEventName);
+        bottomGroups = findViewById(R.id.popupGroups);
+        bottomRoom = findViewById(R.id.popupRoom);
+        bottomType = findViewById(R.id.popupType);
+        bottomTeacher = findViewById(R.id.popupTeacher);
 
         addGroupFAB = findViewById(R.id.addGroupButton1);
         addGroupFAB.setOnClickListener(addGroupButtonListener);
@@ -223,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
                     bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_EXPANDED);
                 }
-            }, 50);
+            }, 80);
         });
 
         toolbar = findViewById(R.id.toolbar);
@@ -254,6 +265,10 @@ public class MainActivity extends AppCompatActivity {
                     refreshGroupsFAB.setVisibility(View.GONE);
                     deleteGroupsFAB.setVisibility(View.GONE);
                     addGroupFAB.setVisibility(View.GONE);
+                }
+                if (i == BottomSheetBehavior.STATE_EXPANDED && savedGroupsList.size() != 0) {
+                    refreshGroupsFAB.setVisibility(View.VISIBLE);
+                    deleteGroupsFAB.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -398,6 +413,13 @@ public class MainActivity extends AppCompatActivity {
                         WeekFragment.weekPlaceholder.setVisibility(View.VISIBLE);
                         refreshGroupsFAB.setVisibility(View.GONE);
                         deleteGroupsFAB.setVisibility(View.GONE);
+
+                        SemesterFragment.semesterPlaceholder.setVisibility(View.VISIBLE);
+                        SemesterFragment.timeline.setVisibility(View.GONE);
+                        SemesterFragment.semesterRecyclerView.setVisibility(View.GONE);
+                        SemesterFragment.backToTodayFAB.setVisibility(View.GONE);
+                        SemesterFragment.semesterRecyclerAdapter.clearList();
+                        SemesterFragment.semesterRecyclerAdapter.notifyDataSetChanged();
                     }
                 });
                 deletionDialog.setNegativeButton("Отменить", null);
@@ -492,6 +514,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @SuppressLint("RestrictedApi")
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
             switch (menuItem.getItemId()) {
@@ -503,17 +526,26 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.semesterBottomNavigationItem:
                     fm.beginTransaction().hide(active).show(semesterFragment).commit();
                     active = semesterFragment;
-                    if (groupDAO.getSelected() != null)
+                    if (groupDAO.getSelected() != null || teacherDAO.getSelected() != null) {
                         toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
+                        SemesterFragment.backToTodayFAB.setVisibility(View.VISIBLE);
+                    } else {
+                        toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(false);
+                        SemesterFragment.backToTodayFAB.setVisibility(View.GONE);
+                    }
                     return true;
             }
             return false;
         }
     };
 
+    @SuppressLint("RestrictedApi")
     private View.OnClickListener addGroupButtonListener = v -> {
         bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
         bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_EXPANDED);
+        deleteGroupsFAB.setVisibility(View.GONE);
+        refreshGroupsFAB.setVisibility(View.GONE);
+
 
     };
 
