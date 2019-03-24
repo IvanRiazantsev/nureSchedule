@@ -8,8 +8,9 @@
     <item>
 
         <bitmap
-            android:gravity="center"
-            android:src="@drawable/app_logo" />
+            android:gravity="fill"
+            android:tileMode="disabled"
+            android:src="@drawable/screen" />
 
     </item>
 

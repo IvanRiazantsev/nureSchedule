@@ -201,8 +201,8 @@ public class MainActivity extends AppCompatActivity {
         active = weekFragment;
 
 
-        new Thread(() -> database.clearAllTables()).start();
-//        database.clearAllTables();
+//        new Thread(() -> database.clearAllTables()).start();
+        database.clearAllTables();
 
         bottomSheetBehaviorSavedGroups = BottomSheetBehavior.from(findViewById(R.id.groupsBottomSheet));
         bottomSheetBehaviorAddGroups = BottomSheetBehavior.from(findViewById(R.id.addGroupBottomSheet));

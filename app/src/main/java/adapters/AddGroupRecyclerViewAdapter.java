@@ -48,7 +48,7 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
     public void updateItem(Object object) {
         if (object instanceof Group) {
             for (int i = 0; i < mList.size(); i++) {
-                if (((Group) mList.get(i)).getId().equals(((Group) object).getId())) {
+                if (mList.get(i) instanceof Group && ((Group) mList.get(i)).getId().equals(((Group) object).getId())) {
                     mList.set(i, object);
                     notifyItemChanged(i);
                     return;
@@ -56,7 +56,7 @@ public class AddGroupRecyclerViewAdapter extends RecyclerView.Adapter<AddGroupRe
             }
         } else {
             for (int i = 0; i < mList.size(); i++) {
-                if (((Teacher) mList.get(i)).getId().equals(((Teacher) object).getId())) {
+                if (mList.get(i) instanceof Teacher && ((Teacher) mList.get(i)).getId().equals(((Teacher) object).getId())) {
                     mList.set(i, object);
                     notifyItemChanged(i);
                     return;

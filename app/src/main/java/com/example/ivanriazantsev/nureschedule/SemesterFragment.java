@@ -75,6 +75,8 @@ public class SemesterFragment extends Fragment {
 
         semesterRecyclerView = view.findViewById(R.id.semesterRecyclerView);
         semesterRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        semesterRecyclerView.setHasFixedSize(true);
+//        semesterRecyclerAdapter.setHasStableIds(true);
 
         backToTodayFAB.setOnClickListener(new View.OnClickListener() {
             @Override
