@@ -2,7 +2,9 @@ package com.example.ivanriazantsev.nureschedule;
 
 import adapters.AddGroupRecyclerViewAdapter;
 import adapters.SavedGroupsRecyclerViewAdapter;
+import adapters.WeekSection;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -18,8 +20,10 @@ import api.Main;
 import api.Speciality;
 import api.Teacher;
 import database.AppDatabase;
+import database.EventDAO;
 import database.GroupDAO;
 import database.TeacherDAO;
+import events.Event;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,6 +34,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.ArrayMap;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,20 +42,29 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.DatePicker;
+import com.applandeo.materialcalendarview.builders.DatePickerBuilder;
+import com.applandeo.materialcalendarview.listeners.OnSelectDateListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PurchasesUpdatedListener {
 
 
     public static Toolbar toolbar;
@@ -65,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
     AppDatabase database = App.getDatabase();
     GroupDAO groupDAO = database.groupDAO();
     TeacherDAO teacherDAO = database.teacherDAO();
+    EventDAO eventDAO = database.eventDAO();
+
+
+
     FloatingActionButton groupFAB;
     FloatingActionButton addGroupFAB;
     public static FloatingActionButton refreshGroupsFAB;
@@ -94,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
     DatePicker datePicker;
 
+    public static BillingClient billingClient;
 
 
     public static BottomSheetBehavior bottomSheetBehaviorInfo;
@@ -185,8 +204,10 @@ public class MainActivity extends AppCompatActivity {
             bottomNavigationView.animate().translationY(0);
             ((TextView) findViewById(R.id.settingsToolbarTitle)).setVisibility(View.GONE);
         } else if (bottomSheetBehaviorSavedGroups.getState() == BottomSheetBehavior.STATE_COLLAPSED
-                && bottomSheetBehaviorAddGroups.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                && bottomSheetBehaviorAddGroups.getState() == BottomSheetBehavior.STATE_COLLAPSED && bottomSheetBehaviorInfo.getState() != BottomSheetBehavior.STATE_EXPANDED) {
             finish();
+        } else if (bottomSheetBehaviorInfo.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            bottomSheetBehaviorInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
         selectedScheduleName.setVisibility(View.VISIBLE);
 
@@ -200,9 +221,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         active = weekFragment;
 
+        billingClient = BillingClient.newBuilder(this).setListener(this).build();
 
-//        new Thread(() -> database.clearAllTables()).start();
-        database.clearAllTables();
+
+//        database.clearAllTables();
 
         bottomSheetBehaviorSavedGroups = BottomSheetBehavior.from(findViewById(R.id.groupsBottomSheet));
         bottomSheetBehaviorAddGroups = BottomSheetBehavior.from(findViewById(R.id.addGroupBottomSheet));
@@ -295,8 +317,8 @@ public class MainActivity extends AppCompatActivity {
         savedGroupsRecyclerView.setAdapter(savedGroupsAdapter);
 
 
-        savedGroupsList.addAll(groupDAO.getAll());
-        savedTeachersList.addAll(teacherDAO.getAll());
+        savedGroupsList.addAll(groupDAO.getAllAdded());
+        savedTeachersList.addAll(teacherDAO.getAllAdded());
 
 
         if (!savedGroupsList.isEmpty() || !savedTeachersList.isEmpty()) {
@@ -387,11 +409,7 @@ public class MainActivity extends AppCompatActivity {
 
         addGroupRecyclerViewAdapter.setList(groupList, teacherList);
 
-        refreshGroupsFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
+        refreshGroupsFAB.setOnClickListener(v -> Toast.makeText(getApplicationContext(), "Coming Soon!", Toast.LENGTH_SHORT).show());
 
         deleteGroupsFAB = findViewById(R.id.deleteGroupsButton);
         deleteGroupsFAB.setOnClickListener(new View.OnClickListener() {
@@ -405,6 +423,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         database.clearAllTables();
+                        for (Group group : groupList) {
+                            group.setRefreshDate("Не обновлялось");
+                        }
+                        for (Teacher teacher : teacherList) {
+                            teacher.setRefreshDate("Не обновлялось");
+                        }
+                        addGroupRecyclerViewAdapter.clearList();
+                        addGroupRecyclerViewAdapter.setList(groupList, teacherList);
                         selectedScheduleName.setText("");
                         WeekFragment.sectionAdapter.removeAllSections();
                         WeekFragment.sectionAdapter.notifyDataSetChanged();
@@ -413,6 +439,7 @@ public class MainActivity extends AppCompatActivity {
                         WeekFragment.weekPlaceholder.setVisibility(View.VISIBLE);
                         refreshGroupsFAB.setVisibility(View.GONE);
                         deleteGroupsFAB.setVisibility(View.GONE);
+
 
                         SemesterFragment.semesterPlaceholder.setVisibility(View.VISIBLE);
                         SemesterFragment.timeline.setVisibility(View.GONE);
@@ -432,9 +459,149 @@ public class MainActivity extends AppCompatActivity {
         });
 
         selectedScheduleName = findViewById(R.id.selectedScheduleName);
-        if (groupDAO.getSelected() != null) {
-            selectedScheduleName.setText(groupDAO.getSelected().getName());
-            selectedScheduleName.setVisibility(View.VISIBLE);
+        if (groupDAO.getSelected() != null || teacherDAO.getSelected() != null) {
+            Object selected = groupDAO.getSelected() != null ? groupDAO.getSelected() : teacherDAO.getSelected();
+
+            Date currentDate = new Date();
+            Date currentDay = App.getStartOfDay(currentDate);
+            Date dayInAWeek = App.getStartOfDayInAWeek(currentDate);
+            List<Event> eventsForWeek = eventDAO.getEventsBetweenTwoDatesForGroup(selected instanceof Group ? ((Group) selected).getName() : ((Teacher) selected).getShortName(),
+                    (int) (currentDay.getTime() / 1000L), (int) (dayInAWeek.getTime() / 1000L));
+
+
+            List<Event> firstDay = new ArrayList<>();
+            List<Event> secondDay = new ArrayList<>();
+            List<Event> thirdDay = new ArrayList<>();
+            List<Event> fourthDay = new ArrayList<>();
+            List<Event> fifthDay = new ArrayList<>();
+            List<Event> sixthDay = new ArrayList<>();
+            List<Event> seventhDay = new ArrayList<>();
+
+            Date[] dates = App.getWeek(currentDay);
+            ArrayList<List<Event>> eventsByDaysList = new ArrayList<>();
+
+            for (Event event : eventsForWeek) {
+                if (event.getStartTime() < dates[1].getTime() / 1000)
+                    firstDay.add(event);
+                else if (event.getStartTime() < dates[2].getTime() / 1000)
+                    secondDay.add(event);
+                else if (event.getStartTime() < dates[3].getTime() / 1000)
+                    thirdDay.add(event);
+                else if (event.getStartTime() < dates[4].getTime() / 1000)
+                    fourthDay.add(event);
+                else if (event.getStartTime() < dates[5].getTime() / 1000)
+                    fifthDay.add(event);
+                else if (event.getStartTime() < dates[6].getTime() / 1000)
+                    sixthDay.add(event);
+                else
+                    seventhDay.add(event);
+            }
+
+
+            eventsByDaysList.add(0, firstDay);
+            eventsByDaysList.add(1, secondDay);
+            eventsByDaysList.add(2, thirdDay);
+            eventsByDaysList.add(3, fourthDay);
+            eventsByDaysList.add(4, fifthDay);
+            eventsByDaysList.add(5, sixthDay);
+            eventsByDaysList.add(6, seventhDay);
+
+            WeekFragment.sectionAdapter.removeAllSections();
+            WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[0].getTime()), eventsByDaysList.get(0)));
+            WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[1].getTime()), eventsByDaysList.get(1)));
+            WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[2].getTime()), eventsByDaysList.get(2)));
+            WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[3].getTime()), eventsByDaysList.get(3)));
+            WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[4].getTime()), eventsByDaysList.get(4)));
+            WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[5].getTime()), eventsByDaysList.get(5)));
+            WeekFragment.sectionAdapter.addSection(new WeekSection(App.getDateForWeek(dates[6].getTime()), eventsByDaysList.get(6)));
+
+
+//            WeekFragment.weekRecyclerView.setAdapter(WeekFragment.sectionAdapter);
+            MainActivity.selectedScheduleName.setText(selected instanceof Group ? ((Group) selected).getName() : ((Teacher) selected).getShortName());
+            MainActivity.selectedScheduleName.setVisibility(View.VISIBLE);
+            MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+//            WeekFragment.weekPlaceholder.setVisibility(View.GONE);
+
+            if (selected instanceof Group) {
+                if (groupDAO.getSelected() != null)
+                    groupDAO.updateIsSelected(false, groupDAO.getSelected().getName());
+                groupDAO.updateIsSelected(true, ((Group) selected).getName());
+            } else {
+                if (teacherDAO.getSelected() != null)
+                    teacherDAO.updateIsSelected(false, teacherDAO.getSelected().getShortName());
+                teacherDAO.updateIsSelected(true, ((Teacher) selected).getShortName());
+            }
+
+
+            List<List<Event>> events = new ArrayList<>();
+
+            Date begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(
+                    selected instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName()))));
+
+            Date end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(
+                    selected instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName())))));
+
+            long millisSinceBegin = new Date().getTime() - begin.getTime();
+            long daysSinceBegin = millisSinceBegin / 1000 / 60 / 60 / 24;
+
+            ArrayMap<Event, List<Event>> simultaneousEvents = new ArrayMap<>();
+
+
+            for (long i = begin.getTime(); i < end.getTime(); i += 86400000) {
+                List<Event> eventsForDay = eventDAO.getEventsBetweenTwoDatesForGroup(
+                        selected instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName(),
+                        (int) (i / 1000), (int) ((i + 86400000) / 1000));
+
+                for (int j = 0; j < eventsForDay.size(); j++) {
+                    Integer startTime = eventsForDay.get(j).getStartTime();
+                    Event current = eventsForDay.get(j);
+                    List<Event> events1 = new ArrayList<>();
+                    for (int q = j + 1; q < eventsForDay.size(); q++) {
+                        if (startTime.equals(eventsForDay.get(q).getStartTime())) {
+                            events1.add(eventsForDay.get(q));
+                            eventsForDay.remove(q);
+                            q--;
+                        }
+                    }
+                    simultaneousEvents.put(current, events1);
+                }
+                events.add(eventsForDay);
+            }
+
+            SemesterFragment.semesterRecyclerAdapter.clearList();
+            SemesterFragment.semesterRecyclerAdapter.setSimultaneousEvents(events, simultaneousEvents);
+//            SemesterFragment.semesterRecyclerView.setItemAnimator(null);
+//            SemesterFragment.semesterRecyclerView.setAdapter(SemesterFragment.semesterRecyclerAdapter);
+//            SemesterFragment.semesterPlaceholder.setVisibility(View.GONE);
+//            SemesterFragment.timeline.setVisibility(View.VISIBLE);
+//            SemesterFragment.semesterRecyclerView.setVisibility(View.VISIBLE);
+//            SemesterFragment.semesterRecyclerView.scrollToPosition((int) daysSinceBegin);
+//            SemesterFragment.backToTodayFAB.setVisibility(View.VISIBLE);
+
+            if (groupDAO.getSelected() != null) {
+
+                SemesterFragment.datePickerBuilder = new DatePickerBuilder(this, new OnSelectDateListener() {
+                    @Override
+                    public void onSelect(List<Calendar> calendar) {
+                        SemesterFragment.semesterRecyclerView.scrollToPosition((int) ((calendar.get(0).getTimeInMillis() - begin.getTime()) / 1000 / 60 / 60 / 24));
+                    }
+                }).pickerType(CalendarView.ONE_DAY_PICKER).minimumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMinTimeForGroup(groupDAO.getSelected().getName()))))
+                        .maximumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMaxTimeForGroup(groupDAO.getSelected().getName()))))
+                        .daysLabelsColor(R.color.colorAccent).pagesColor(R.color.pagesColor).headerColor(R.color.colorBackground);
+            } else if (teacherDAO.getSelected() != null) {
+                SemesterFragment.datePickerBuilder = new DatePickerBuilder(this, new OnSelectDateListener() {
+                    @Override
+                    public void onSelect(List<Calendar> calendar) {
+                        SemesterFragment.semesterRecyclerView.scrollToPosition((int) ((calendar.get(0).getTimeInMillis() - begin.getTime()) / 1000 / 60 / 60 / 24));
+                    }
+                }).pickerType(CalendarView.ONE_DAY_PICKER).minimumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMinTimeForGroup(teacherDAO.getSelected().getShortName()))))
+                        .maximumDate(App.getStartOfDayCalendar(App.getDateFromUnix((long) eventDAO.getMaxTimeForGroup(teacherDAO.getSelected().getShortName()))))
+                        .daysLabelsColor(R.color.colorAccent).pagesColor(R.color.pagesColor).headerColor(R.color.colorBackground);
+            }
+
+            if (MainActivity.active != MainActivity.weekFragment)
+                MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
         }
 
 
@@ -550,4 +717,8 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
+    @Override
+    public void onPurchasesUpdated(int responseCode, @Nullable List<Purchase> purchases) {
+
+    }
 }

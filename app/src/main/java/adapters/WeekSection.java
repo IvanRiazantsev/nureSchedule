@@ -1,25 +1,17 @@
 package adapters;
 
-import android.os.CountDownTimer;
 import android.util.ArrayMap;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.PopupWindow;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.example.ivanriazantsev.nureschedule.App;
 import com.example.ivanriazantsev.nureschedule.MainActivity;
 import com.example.ivanriazantsev.nureschedule.R;
 import com.example.ivanriazantsev.nureschedule.WeekFragment;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.card.MaterialCardView;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import database.GroupDAO;
@@ -27,7 +19,6 @@ import database.SubjectDAO;
 import database.TeacherDAO;
 import database.TypeDAO;
 import events.Event;
-import events.Events;
 import events.Type;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
@@ -42,7 +33,6 @@ public class WeekSection extends StatelessSection {
     private GroupDAO groupDAO = App.getDatabase().groupDAO();
     private TeacherDAO teacherDAO = App.getDatabase().teacherDAO();
     ArrayMap<Event, List<Event>> simultaneousEvents = new ArrayMap<>();
-    PopupWindow popupWindow;
 
 
     public WeekSection(String date, List<Event> eventList) {
@@ -114,56 +104,50 @@ public class WeekSection extends StatelessSection {
 
 
         Event finalEvent = event;
-        itemHolder.nextAlternativeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int current = -1;
-                for (int i = 0; i < size; i++) {
-                    if (itemHolder.eventRoom.getText().toString().equals(simultaneousEvents.get(finalEvent).get(i).getAuditory())) {
-                        current = i;
-                        break;
-                    }
+        itemHolder.nextAlternativeButton.setOnClickListener(v -> {
+            int current = -1;
+            for (int i = 0; i < size; i++) {
+                if (itemHolder.eventRoom.getText().toString().equals(simultaneousEvents.get(finalEvent).get(i).getAuditory())) {
+                    current = i;
+                    break;
                 }
-                if (current != size - 1) {
-                    eventList.set(position, simultaneousEvents.get(finalEvent).get(current + 1));
-
-                } else {
-                    eventList.set(position, finalEvent);
-                }
-
-                WeekFragment.sectionAdapter.notifyItemChangedInSection(WeekSection.this, position);
-
             }
+            if (current != size - 1) {
+                eventList.set(position, simultaneousEvents.get(finalEvent).get(current + 1));
+
+            } else {
+                eventList.set(position, finalEvent);
+            }
+
+            WeekFragment.sectionAdapter.notifyItemChangedInSection(WeekSection.this, position);
+
         });
 
-        itemHolder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        itemHolder.cardView.setOnClickListener(v -> {
 
-                MainActivity.bottomEventName.setText(subjectDAO.getById(eventList.get(position).getSubjectId()).getTitle());
-                MainActivity.bottomRoom.setText(eventList.get(position).getAuditory());
-                MainActivity.bottomType.setText(typeDAO.getById(eventList.get(position).getType()).getShortName());
+            MainActivity.bottomEventName.setText(subjectDAO.getById(eventList.get(position).getSubjectId()).getTitle());
+            MainActivity.bottomRoom.setText(eventList.get(position).getAuditory());
+            MainActivity.bottomType.setText(typeDAO.getById(eventList.get(position).getType()).getShortName());
 
-                StringBuilder groups = new StringBuilder();
-                for (Integer integer : eventList.get(position).getGroups()) {
-                    groups.append(groupDAO.getById(integer).getName()).append("\n");
-                }
-                groups.deleteCharAt(groups.lastIndexOf("\n"));
-                MainActivity.bottomGroups.setText(groups.toString());
-
-                StringBuilder teachers = new StringBuilder();
-                if (eventList.get(position).getTeachers() != null) {
-                    for (Integer integer : eventList.get(position).getTeachers()) {
-                        teachers.append(teacherDAO.getById(integer).getFullName()).append("\n");
-                    }
-                    teachers.deleteCharAt(teachers.lastIndexOf("\n"));
-                }
-                MainActivity.bottomTeacher.setText(teachers.toString());
-
-                MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                MainActivity.bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                MainActivity.bottomSheetBehaviorInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+            StringBuilder groups = new StringBuilder();
+            for (Integer integer : eventList.get(position).getGroups()) {
+                groups.append(groupDAO.getById(integer).getName()).append("\n");
             }
+            groups.deleteCharAt(groups.lastIndexOf("\n"));
+            MainActivity.bottomGroups.setText(groups.toString());
+
+            StringBuilder teachers = new StringBuilder();
+            if (eventList.get(position).getTeachers() != null) {
+                for (Integer integer : eventList.get(position).getTeachers()) {
+                    teachers.append(teacherDAO.getById(integer).getFullName()).append("\n");
+                }
+                teachers.deleteCharAt(teachers.lastIndexOf("\n"));
+            }
+            MainActivity.bottomTeacher.setText(teachers.toString());
+
+            MainActivity.bottomSheetBehaviorSavedGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            MainActivity.bottomSheetBehaviorAddGroups.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            MainActivity.bottomSheetBehaviorInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
         });
     }
 
@@ -202,8 +186,6 @@ public class WeekSection extends StatelessSection {
             nextAlternativeButton = itemView.findViewById(R.id.nextAlternativeSubjectButton);
             divider = itemView.findViewById(R.id.divider4);
 
-
-//
         }
 
     }

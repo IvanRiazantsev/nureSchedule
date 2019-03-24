@@ -3,12 +3,12 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android"
     android:opacity="opaque">
 
-    <item android:drawable="@color/colorToolbarLight" />
+    <item android:drawable="@color/colorBackground" />
 
     <item>
 
         <bitmap
-            android:gravity="fill"
+            android:gravity="center"
             android:tileMode="disabled"
             android:src="@drawable/screen" />
 

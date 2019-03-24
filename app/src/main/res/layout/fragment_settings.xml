@@ -1,18 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
-
     tools:context=".SettingsFragment">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textColor="#FFF"
-        android:textSize="25sp"
-        android:gravity="center"
-        android:text="Coming Soon!" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/appearanceTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Внешний вид"
+        android:textColor="#fff"
+        android:textSize="25sp"
+        app:layout_constraintTop_toTopOf="parent"
+
+        />
+
+    <TextView
+        android:id="@+id/lightThemeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:text="Светлая тема (пока недоступно)"
+        android:textColor="#fff"
+        android:textSize="17sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appearanceTextView" />
+
+    <Switch
+        android:id="@+id/lightThemeSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:enabled="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appearanceTextView" />
+
+    <TextView
+        android:id="@+id/defaultActiveFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="Окно по умолчанию (пока недоступно)"
+        android:textColor="#fff"
+        android:textSize="17sp"
+        app:layout_constraintTop_toBottomOf="@id/lightThemeText" />
+
+
+    <TextView
+        android:id="@+id/aboutTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:text="О приложении"
+        android:textColor="#fff"
+        android:textSize="25sp"
+        app:layout_constraintTop_toBottomOf="@id/defaultActiveFragment"
+
+        />
+
+
+    <TextView
+        android:id="@+id/appNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:text="nureSchedule 0.9 (beta)"
+        android:textColor="#fff"
+        android:textSize="17sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/aboutTextView" />
+
+    <TextView
+        android:id="@+id/copyrightTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:text="\u00a9 Ivan Riazantsev, 2019. All rights reserved."
+        android:textColor="#fff"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appNameTextView" />
+
+    <View
+        android:id="@+id/divider6"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="#696767"
+        app:layout_constraintTop_toBottomOf="@id/copyrightTextView" />
+
+    <TextView
+        android:id="@+id/donate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:text="Поддержать разработчика"
+        android:textColor="#fff"
+        android:textSize="17sp"
+        app:layout_constraintTop_toBottomOf="@id/divider6" />
+
+    <LinearLayout
+        android:id="@+id/donationButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/donate">
+
+        <com.google.android.material.button.MaterialButton
+
+            android:id="@+id/donation15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:text="15 \u20B4"
+            android:textColor="#000"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/donate"
+            app:rippleColor="#000" />
+
+        <com.google.android.material.button.MaterialButton
+
+            android:id="@+id/donation30"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:text="30 \u20B4"
+            android:textColor="#000"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/donate"
+            app:rippleColor="#000" />
+
+        <com.google.android.material.button.MaterialButton
+
+            android:id="@+id/donation50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:text="50 \u20B4"
+            android:textColor="#000"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/donate"
+            app:rippleColor="#000" />
+
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider7"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="#696767"
+        app:layout_constraintTop_toBottomOf="@id/donationButtons" />
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--app:layout_constraintTop_toBottomOf="@id/lightThemeText"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--android:layout_marginTop="5dp"-->
+    <!--android:textColor="#fff"-->
+    <!--android:textSize="20sp"-->
+    <!--android:text=""-->
+    <!--/>-->
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

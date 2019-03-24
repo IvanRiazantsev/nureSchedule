@@ -31,6 +31,7 @@ import api.Group;
 import database.AppDatabase;
 import database.EventDAO;
 import database.GroupDAO;
+import database.TeacherDAO;
 import events.Event;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
@@ -47,6 +48,7 @@ public class WeekFragment extends Fragment {
     private AppDatabase database = App.getDatabase();
     private GroupDAO groupDAO = database.groupDAO();
     private EventDAO eventDAO = database.eventDAO();
+    private TeacherDAO teacherDAO = database.teacherDAO();
 
     public WeekFragment() {
     }
@@ -61,10 +63,16 @@ public class WeekFragment extends Fragment {
 
         weekPlaceholder = view.findViewById(R.id.weekPlaceholder);
 
+        if (groupDAO.getSelected() != null || teacherDAO.getSelected() != null) {
+            weekPlaceholder.setVisibility(View.GONE);
+        }
+
 
         weekRecyclerView = view.findViewById(R.id.weekRecyclerView);
         weekRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         weekRecyclerView.setItemAnimator(null);
+        weekRecyclerView.setHasFixedSize(true);
+        weekRecyclerView.setAdapter(sectionAdapter);
 
 
 

@@ -133,10 +133,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 deleteDialog.setPositiveButton("Удалить", (dialog, which) -> {
                     int position = getAdapterPosition();
 
-                    if ((groupDAO.getSelected() != null || teacherDAO.getSelected() != null) && (mList.get(position) instanceof Group
-                            ? ((Group) mList.get(position)).getName().equals(groupDAO.getSelected().getName())
-                            : ((Teacher) mList.get(position)).getShortName().equals(teacherDAO.getSelected().getShortName()))) {
-                        //TODO:FIX
+                    if (groupDAO.getSelected() != null && mList.get(position) instanceof Group) {
                         MainActivity.selectedScheduleName.setText("");
                         WeekFragment.sectionAdapter.removeAllSections();
                         WeekFragment.sectionAdapter.notifyDataSetChanged();
@@ -147,13 +144,47 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                         SemesterFragment.semesterRecyclerView.setVisibility(View.GONE);
                         SemesterFragment.backToTodayFAB.setVisibility(View.GONE);
                         SemesterFragment.semesterRecyclerAdapter.clearList();
-                        if ((mList.get(getAdapterPosition()) instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName()).equals(name.getText().toString())) {
+                        if (groupDAO.getSelected().getName().equals(((Group) mList.get(position)).getName())) {
                             MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(false);
                         }
                         groupDAO.updateIsSelected(false, name.getText().toString());
-                        teacherDAO.updateIsSelected(false, name.getText().toString());
+                    } else if (teacherDAO.getSelected() != null && mList.get(position) instanceof Teacher) {
+                        MainActivity.selectedScheduleName.setText("");
+                        WeekFragment.sectionAdapter.removeAllSections();
+                        WeekFragment.sectionAdapter.notifyDataSetChanged();
+                        WeekFragment.weekPlaceholder.setVisibility(View.VISIBLE);
 
+                        SemesterFragment.semesterPlaceholder.setVisibility(View.VISIBLE);
+                        SemesterFragment.timeline.setVisibility(View.GONE);
+                        SemesterFragment.semesterRecyclerView.setVisibility(View.GONE);
+                        SemesterFragment.backToTodayFAB.setVisibility(View.GONE);
+                        SemesterFragment.semesterRecyclerAdapter.clearList();
+                        if (teacherDAO.getSelected().getShortName().equals(((Teacher) mList.get(position)).getShortName())) {
+                            MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(false);
+                        }
+                        teacherDAO.updateIsSelected(false, name.getText().toString());
                     }
+
+//                    if ((groupDAO.getSelected() != null || teacherDAO.getSelected() != null) && (mList.get(position) instanceof Group
+//                            ? ((Group) mList.get(position)).getName().equals(groupDAO.getSelected().getName())
+//                            : ((Teacher) mList.get(position)).getShortName().equals(teacherDAO.getSelected().getShortName()))) {
+//                        MainActivity.selectedScheduleName.setText("");
+//                        WeekFragment.sectionAdapter.removeAllSections();
+//                        WeekFragment.sectionAdapter.notifyDataSetChanged();
+//                        WeekFragment.weekPlaceholder.setVisibility(View.VISIBLE);
+//
+//                        SemesterFragment.semesterPlaceholder.setVisibility(View.VISIBLE);
+//                        SemesterFragment.timeline.setVisibility(View.GONE);
+//                        SemesterFragment.semesterRecyclerView.setVisibility(View.GONE);
+//                        SemesterFragment.backToTodayFAB.setVisibility(View.GONE);
+//                        SemesterFragment.semesterRecyclerAdapter.clearList();
+//                        if ((mList.get(getAdapterPosition()) instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName()).equals(name.getText().toString())) {
+//                            MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(false);
+//                        }
+//                        groupDAO.updateIsSelected(false, name.getText().toString());
+//                        teacherDAO.updateIsSelected(false, name.getText().toString());
+//
+//                    }
                     groupDAO.setAddedByName(false, name.getText().toString());
                     teacherDAO.setAddedByName(false, name.getText().toString());
                     groupDAO.updateGroupRefreshDate("Не обновлялось", name.getText().toString());
@@ -347,13 +378,16 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
 
                 WeekFragment.weekPlaceholder.setVisibility(View.GONE);
 
+                if (groupDAO.getSelected() != null) {
+                    groupDAO.updateIsSelected(false, groupDAO.getSelected().getName());
+                }
+                if (teacherDAO.getSelected() != null) {
+                    teacherDAO.updateIsSelected(false, teacherDAO.getSelected().getShortName());
+                }
+
                 if (mList.get(getAdapterPosition()) instanceof Group) {
-                    if (groupDAO.getSelected() != null)
-                        groupDAO.updateIsSelected(false, groupDAO.getSelected().getName());
                     groupDAO.updateIsSelected(true, name.getText().toString());
                 } else {
-                    if (teacherDAO.getSelected() != null)
-                        teacherDAO.updateIsSelected(false, teacherDAO.getSelected().getShortName());
                     teacherDAO.updateIsSelected(true, name.getText().toString());
                 }
 

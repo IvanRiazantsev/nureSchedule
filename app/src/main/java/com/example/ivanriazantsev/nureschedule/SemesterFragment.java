@@ -1,6 +1,7 @@
 package com.example.ivanriazantsev.nureschedule;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -33,9 +34,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import api.Group;
 import database.AppDatabase;
 import database.EventDAO;
 import database.GroupDAO;
+import database.TeacherDAO;
 
 
 public class SemesterFragment extends Fragment {
@@ -51,6 +54,7 @@ public class SemesterFragment extends Fragment {
     private AppDatabase database = App.getDatabase();
     private GroupDAO groupDAO = database.groupDAO();
     private EventDAO eventDAO = database.eventDAO();
+    private TeacherDAO teacherDAO = database.teacherDAO();
 
     public static FloatingActionButton backToTodayFAB;
 
@@ -58,6 +62,7 @@ public class SemesterFragment extends Fragment {
     }
 
 
+    @SuppressLint("RestrictedApi")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -73,10 +78,15 @@ public class SemesterFragment extends Fragment {
         timeline = view.findViewById(R.id.timeline);
         backToTodayFAB = view.findViewById(R.id.backToTodayFAB);
 
+
+
+
         semesterRecyclerView = view.findViewById(R.id.semesterRecyclerView);
         semesterRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         semesterRecyclerView.setHasFixedSize(true);
-//        semesterRecyclerAdapter.setHasStableIds(true);
+        semesterRecyclerAdapter.setHasStableIds(true);
+        semesterRecyclerView.setItemAnimator(null);
+        semesterRecyclerView.setAdapter(semesterRecyclerAdapter);
 
         backToTodayFAB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +94,24 @@ public class SemesterFragment extends Fragment {
                 semesterRecyclerView.scrollToPosition((int) ((new Date().getTime() - SavedGroupsRecyclerViewAdapter.begin.getTime()) / 1000 / 60 / 60 / 24));
             }
         });
+
+        if (groupDAO.getSelected() != null || teacherDAO.getSelected() != null) {
+            Object selected = groupDAO.getSelected() != null ? groupDAO.getSelected() : teacherDAO.getSelected();
+            Date begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(
+                    selected instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName()))));
+
+
+            long millisSinceBegin = new Date().getTime() - begin.getTime();
+            long daysSinceBegin = millisSinceBegin / 1000 / 60 / 60 / 24;
+
+
+
+            SemesterFragment.semesterPlaceholder.setVisibility(View.GONE);
+            SemesterFragment.timeline.setVisibility(View.VISIBLE);
+            SemesterFragment.semesterRecyclerView.setVisibility(View.VISIBLE);
+            SemesterFragment.backToTodayFAB.setVisibility(View.VISIBLE);
+            semesterRecyclerView.scrollToPosition((int) daysSinceBegin);
+        }
 
 
         return view;
