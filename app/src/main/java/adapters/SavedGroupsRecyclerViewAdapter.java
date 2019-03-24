@@ -17,11 +17,11 @@ import android.widget.Toast;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.builders.DatePickerBuilder;
 import com.applandeo.materialcalendarview.listeners.OnSelectDateListener;
-import com.example.ivanriazantsev.nureschedule.App;
-import com.example.ivanriazantsev.nureschedule.MainActivity;
-import com.example.ivanriazantsev.nureschedule.R;
-import com.example.ivanriazantsev.nureschedule.SemesterFragment;
-import com.example.ivanriazantsev.nureschedule.WeekFragment;
+import com.ivanriazantsev.nureschedule.App;
+import com.ivanriazantsev.nureschedule.MainActivity;
+import com.ivanriazantsev.nureschedule.R;
+import com.ivanriazantsev.nureschedule.SemesterFragment;
+import com.ivanriazantsev.nureschedule.WeekFragment;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;

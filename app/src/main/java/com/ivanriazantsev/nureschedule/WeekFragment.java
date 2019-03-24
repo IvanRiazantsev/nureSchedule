@@ -1,4 +1,4 @@
-package com.example.ivanriazantsev.nureschedule;
+package com.ivanriazantsev.nureschedule;
 
 
 import android.content.Context;

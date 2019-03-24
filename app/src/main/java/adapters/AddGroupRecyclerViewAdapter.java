@@ -10,9 +10,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.example.ivanriazantsev.nureschedule.App;
-import com.example.ivanriazantsev.nureschedule.MainActivity;
-import com.example.ivanriazantsev.nureschedule.R;
+import com.ivanriazantsev.nureschedule.App;
+import com.ivanriazantsev.nureschedule.MainActivity;
+import com.ivanriazantsev.nureschedule.R;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;

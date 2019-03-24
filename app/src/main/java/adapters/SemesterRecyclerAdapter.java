@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.example.ivanriazantsev.nureschedule.App;
-import com.example.ivanriazantsev.nureschedule.MainActivity;
-import com.example.ivanriazantsev.nureschedule.R;
-import com.example.ivanriazantsev.nureschedule.SemesterFragment;
+import com.ivanriazantsev.nureschedule.App;
+import com.ivanriazantsev.nureschedule.MainActivity;
+import com.ivanriazantsev.nureschedule.R;
+import com.ivanriazantsev.nureschedule.SemesterFragment;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.example.ivanriazantsev.nureschedule;
+package com.ivanriazantsev.nureschedule;
 
 import adapters.AddGroupRecyclerViewAdapter;
 import adapters.SavedGroupsRecyclerViewAdapter;
@@ -43,7 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
+
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.applandeo.materialcalendarview.CalendarView;
