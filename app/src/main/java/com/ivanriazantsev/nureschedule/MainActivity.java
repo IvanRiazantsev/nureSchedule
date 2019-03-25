@@ -44,6 +44,7 @@ import android.widget.Toast;
 
 import com.android.billingclient.api.BillingClient;
 
+import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.applandeo.materialcalendarview.CalendarView;
@@ -80,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     GroupDAO groupDAO = database.groupDAO();
     TeacherDAO teacherDAO = database.teacherDAO();
     EventDAO eventDAO = database.eventDAO();
-
 
 
     FloatingActionButton groupFAB;
@@ -121,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     public static TextView bottomRoom;
     public static TextView bottomTeacher;
     public static TextView bottomGroups;
+
+    public static Date begin;
+    public static Date end;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -453,8 +456,6 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                 deletionDialog.show();
 
 
-
-
             }
         });
 
@@ -536,10 +537,10 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
             List<List<Event>> events = new ArrayList<>();
 
-            Date begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(
+            begin = App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMinTimeForGroup(
                     selected instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName()))));
 
-            Date end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(
+            end = App.getStartOfNextDay(App.getStartOfDay(App.getDateFromUnix((long) (eventDAO.getMaxTimeForGroup(
                     selected instanceof Group ? groupDAO.getSelected().getName() : teacherDAO.getSelected().getShortName())))));
 
             long millisSinceBegin = new Date().getTime() - begin.getTime();
@@ -571,13 +572,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
             SemesterFragment.semesterRecyclerAdapter.clearList();
             SemesterFragment.semesterRecyclerAdapter.setSimultaneousEvents(events, simultaneousEvents);
-//            SemesterFragment.semesterRecyclerView.setItemAnimator(null);
-//            SemesterFragment.semesterRecyclerView.setAdapter(SemesterFragment.semesterRecyclerAdapter);
-//            SemesterFragment.semesterPlaceholder.setVisibility(View.GONE);
-//            SemesterFragment.timeline.setVisibility(View.VISIBLE);
-//            SemesterFragment.semesterRecyclerView.setVisibility(View.VISIBLE);
-//            SemesterFragment.semesterRecyclerView.scrollToPosition((int) daysSinceBegin);
-//            SemesterFragment.backToTodayFAB.setVisibility(View.VISIBLE);
+
 
             if (groupDAO.getSelected() != null) {
 
@@ -603,6 +598,8 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             if (MainActivity.active != MainActivity.weekFragment)
                 MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
         }
+
+
 
 
     }
@@ -719,6 +716,37 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
     @Override
     public void onPurchasesUpdated(int responseCode, @Nullable List<Purchase> purchases) {
+        if (responseCode == BillingClient.BillingResponse.OK) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage("Merci! :3");
+            builder.setCancelable(true);
+            builder.show();
+            allowMultiplePurchases(purchases);
+        }
 
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage("Что-то пошло не так :(");
+            builder.setCancelable(true);
+            builder.show();
+
+        }
+
+    }
+
+    private void allowMultiplePurchases(List<Purchase> purchases) {
+        Purchase purchase = purchases.get(0);
+        if (purchase != null) {
+            billingClient.consumeAsync(purchase.getPurchaseToken(), new ConsumeResponseListener() {
+                @Override
+                public void onConsumeResponse(int responseCode, String purchaseToken) {
+                    if (responseCode == BillingClient.BillingResponse.OK && purchaseToken != null) {
+                        System.out.println("Successfully allowed");
+                    } else {
+                        System.out.println("Error " + responseCode);
+                    }
+                }
+            });
+        }
     }
 }

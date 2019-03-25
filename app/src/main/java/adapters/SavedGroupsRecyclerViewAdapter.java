@@ -133,7 +133,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                 deleteDialog.setPositiveButton("Удалить", (dialog, which) -> {
                     int position = getAdapterPosition();
 
-                    if (groupDAO.getSelected() != null && mList.get(position) instanceof Group) {
+                    if (groupDAO.getSelected() != null && mList.get(position) instanceof Group && groupDAO.getSelected().getName().equals(((Group) mList.get(position)).getName())) {
                         MainActivity.selectedScheduleName.setText("");
                         WeekFragment.sectionAdapter.removeAllSections();
                         WeekFragment.sectionAdapter.notifyDataSetChanged();
@@ -148,7 +148,7 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                             MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(false);
                         }
                         groupDAO.updateIsSelected(false, name.getText().toString());
-                    } else if (teacherDAO.getSelected() != null && mList.get(position) instanceof Teacher) {
+                    } else if (teacherDAO.getSelected() != null && mList.get(position) instanceof Teacher && teacherDAO.getSelected().getShortName().equals(((Teacher) mList.get(position)).getShortName())) {
                         MainActivity.selectedScheduleName.setText("");
                         WeekFragment.sectionAdapter.removeAllSections();
                         WeekFragment.sectionAdapter.notifyDataSetChanged();
@@ -462,6 +462,8 @@ public class SavedGroupsRecyclerViewAdapter extends RecyclerView.Adapter<SavedGr
                     MainActivity.toolbar.getMenu().findItem(R.id.calendarToolbarItem).setVisible(true);
 
             });
+
+            settingsButton.setOnClickListener(v -> Toast.makeText(itemView.getContext(), "Coming Soon!", Toast.LENGTH_SHORT).show());
 
 
         }

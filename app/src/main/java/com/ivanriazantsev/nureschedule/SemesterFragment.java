@@ -56,6 +56,7 @@ public class SemesterFragment extends Fragment {
     private EventDAO eventDAO = database.eventDAO();
     private TeacherDAO teacherDAO = database.teacherDAO();
 
+
     public static FloatingActionButton backToTodayFAB;
 
     public SemesterFragment() {
@@ -79,8 +80,6 @@ public class SemesterFragment extends Fragment {
         backToTodayFAB = view.findViewById(R.id.backToTodayFAB);
 
 
-
-
         semesterRecyclerView = view.findViewById(R.id.semesterRecyclerView);
         semesterRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         semesterRecyclerView.setHasFixedSize(true);
@@ -91,7 +90,10 @@ public class SemesterFragment extends Fragment {
         backToTodayFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                semesterRecyclerView.scrollToPosition((int) ((new Date().getTime() - SavedGroupsRecyclerViewAdapter.begin.getTime()) / 1000 / 60 / 60 / 24));
+                if (MainActivity.begin != null)
+                    semesterRecyclerView.scrollToPosition((int) ((new Date().getTime() - MainActivity.begin.getTime()) / 1000 / 60 / 60 / 24));
+                else
+                    semesterRecyclerView.scrollToPosition((int) ((new Date().getTime() - SavedGroupsRecyclerViewAdapter.begin.getTime()) / 1000 / 60 / 60 / 24));
             }
         });
 
@@ -103,7 +105,6 @@ public class SemesterFragment extends Fragment {
 
             long millisSinceBegin = new Date().getTime() - begin.getTime();
             long daysSinceBegin = millisSinceBegin / 1000 / 60 / 60 / 24;
-
 
 
             SemesterFragment.semesterPlaceholder.setVisibility(View.GONE);

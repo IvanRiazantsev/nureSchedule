@@ -77,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        android:text="nureSchedule 0.9 (beta)"
+        android:text="nureSchedule 0.9.1.2 (beta)"
         android:textColor="#fff"
         android:textSize="17sp"
         app:layout_constraintStart_toStartOf="parent"
